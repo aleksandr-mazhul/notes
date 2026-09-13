@@ -1,22 +1,52 @@
-import type { Note } from './types';
+import type {Note} from './types';
 import {useState} from "react";
+import NoteCard from "./NoteCard.tsx";
+import CreateNoteForm from "./CreateNoteForm.tsx";
 
 function App() {
-  const [note ] = useState<Note[]>([{
-    title: 'My First Note',
-    content: 'This is the content of my first note.',
-    createdAt: new Date(),
-    hidden: false
-  }]);
+  const [notes, setNotes] = useState<Note[]>(() => {
+    return [
+      {
+        id: 1,
+        title: 'My first note',
+        content: 'This is the content of my first note.',
+        createdAt: new Date(),
+        hidden: false,
+      },
+      {
+        id: 2,
+        title: 'My second note',
+        content: 'This is the content of my second note.',
+        createdAt: new Date(),
+        hidden: true,
+      },
+      {
+        id: 3,
+        title: 'My third note',
+        content: 'This is the content of my third note.',
+        createdAt: new Date(),
+        hidden: true,
+      }
+    ] satisfies Note[];
+  });
+
+
+  const handleSubmit = (note: Note) => {
+    setNotes([...notes, note]);
+  };
 
   return (
-    <div className="App">
-
-      <header className="App-header">
-        <h1>Welcome to My App</h1>
-      </header>
+    <div>
+      <h1>My Notes</h1>
+      <CreateNoteForm onSubmit={handleSubmit} />
+      {notes.map((note) => (
+        <NoteCard
+          key={note.id}
+          note={note}
+        />
+      ))}
     </div>
-  );
+  )
 }
 
 export default App

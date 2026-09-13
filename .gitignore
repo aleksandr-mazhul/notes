@@ -27,7 +27,7 @@ lerna-debug.log*
 .turbo/
 .vite/
 
-# Test / coverage
+# Test / covera
 coverage/
 playwright-report/
 test-results/
