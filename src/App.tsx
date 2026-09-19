@@ -12,6 +12,7 @@ function App() {
         content: 'This is the content of my first note.',
         createdAt: new Date(),
         hidden: false,
+        tags: ['work', 'important']
       },
       {
         id: 2,
@@ -19,6 +20,7 @@ function App() {
         content: 'This is the content of my second note.',
         createdAt: new Date(),
         hidden: true,
+        tags: ['personal', 'private']
       },
       {
         id: 3,
@@ -26,6 +28,7 @@ function App() {
         content: 'This is the content of my third note.',
         createdAt: new Date(),
         hidden: true,
+        tags: ['school', 'homework']
       }
     ] satisfies Note[];
   });

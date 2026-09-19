@@ -12,6 +12,7 @@ export default function NoteCard({note}: Props) {
       <div className={styles.row}>
         <p>{note.createdAt.toLocaleString()}</p>
         <p>{note.hidden ? 'Hidden' : 'Visible'}</p>
+        <p>{note.tags.join(', ')}</p>
       </div>
       <p>{note.content}</p>
     </div>
