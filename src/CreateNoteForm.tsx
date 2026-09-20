@@ -1,111 +1,85 @@
-import { useState } from 'react'
 import type { Note } from './types'
+import { type SubmitHandler, useForm } from 'react-hook-form'
 
 interface Props {
-  onSubmit: (note: Note) => void
+  onSubmit: (note: Omit<Note, 'id'>) => void
 }
 
 export default function CreateNoteForm({ onSubmit }: Props) {
-  const [title, setTitle] = useState('')
-  const [titleError, setTitleError] = useState('')
-
-  const [tags, setTags] = useState('')
-  const [tagsError, setTagsError] = useState('')
-
-  const [content, setContent] = useState('')
-  const [hidden, setHidden] = useState(false)
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const currentTitle = title.trim()
-    if (currentTitle.length === 0) {
-      setTitleError('Title is required')
-      return
-    }
-    if (tagsError) {
-      return
-    }
-
-    const currentTags = tags
-      .split(',')
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0)
-
-    if (currentTags.length > 5) {
-      setTagsError('You can only add up to 5 tags')
-      return
-    }
-
-    const note: Note = {
-      id: Date.now().toString(),
-      title: title.trim(),
-      content: content.trim(),
-      createdAt: new Date(),
-      hidden: hidden,
-      tags: currentTags,
-    }
-
-    onSubmit(note)
-    setTitle('')
-    setTags('')
-    setContent('')
-    setHidden(false)
-    setTitleError('')
-
-    setTagsError('')
+  type CreateNoteFormValues = {
+    title: string
+    content: string
+    tags: string
+    hidden: boolean
   }
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<CreateNoteFormValues>({ mode: 'all' })
+
+  const HandleFormSubmit: SubmitHandler<CreateNoteFormValues> = (data) => {
+    onSubmit({
+      title: data.title.trim(),
+      content: data.content.trim(),
+      createdAt: new Date(),
+      hidden: data.hidden,
+      tags: data.tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0),
+    })
+    reset()
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(HandleFormSubmit)}>
       <div>
         <input
           type="text"
           placeholder="Title"
-          value={title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-            setTitle(e.target.value)
-          }
-          name="title"
+          {...register('title', {
+            validate: (value) => {
+              return value.trim().length > 0 || 'Title is required'
+            },
+          })}
         />
-        {titleError && <p>{titleError}</p>}
+        {errors.title && <p>{errors.title.message}</p>}
       </div>
+
       <div>
-        <textarea
-          placeholder="Content"
-          value={content}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>): void =>
-            setContent(e.target.value)
-          }
-          name="content"
-        />
+        <textarea placeholder="Content" {...register('content')} />
       </div>
+
       <div>
         <input
           type="text"
           placeholder="Tags"
-          value={tags}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
-            setTags(e.target.value)
-            setTagsError('')
-          }}
-          name="tags"
+          {...register('tags', {
+            validate: (value) => {
+              const Tags = value
+                .split(',')
+                .map((tag) => tag.trim())
+                .filter((tag) => tag.length > 0)
+              return Tags.length <= 5 || 'You can only add up to 5 tags'
+            },
+          })}
         />
-        {tagsError && <p>{tagsError}</p>}
+        {errors.tags && <p>{errors.tags.message}</p>}
       </div>
+
       <div>
         <label>
-          <input
-            type="checkbox"
-            checked={hidden}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-              setHidden(e.target.checked)
-            }
-            name="hidden"
-          />
+          <input type="checkbox" {...register('hidden')} />
           Hidden
         </label>
       </div>
-      <button type="submit">Add Note</button>
+
+      <button type="submit" disabled={!isValid}>
+        Add Note
+      </button>
     </form>
   )
 }

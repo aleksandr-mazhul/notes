@@ -23,7 +23,7 @@ function App() {
       })
   }, [])
 
-  const handleSubmit = (note: Note) => {
+  const handleSubmit = (note: Omit<Note, 'id'>) => {
     fetch('http://localhost:3000/notes', {
       method: 'POST',
       headers: {
@@ -45,12 +45,31 @@ function App() {
       })
   }
 
+  const handleDelete = (id: string) => {
+    fetch(`http://localhost:3000/notes/${id}`, {
+      method: 'DELETE',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        setNotes((prevNotes) =>
+          prevNotes.filter((note) => {
+            return note.id !== id
+          }),
+        )
+      })
+      .catch((error) => {
+        console.error('Error deleting note:', error)
+      })
+  }
+
   return (
     <div>
       <h1>My Notes</h1>
       <CreateNoteForm onSubmit={handleSubmit} />
       {notes.map((note) => (
-        <NoteCard key={note.id} note={note} />
+        <NoteCard key={note.id} note={note} onDelete={handleDelete} />
       ))}
     </div>
   )

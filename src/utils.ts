@@ -7,7 +7,7 @@ export function mapNoteFromDTO(note: NoteDTO): Note {
   }
 }
 
-export function mapNoteToDTO(note: Note): NoteDTO {
+export function mapNoteToDTO(note: Omit<Note, 'id'>): Omit<NoteDTO, 'id'> {
   return {
     ...note,
     createdAt: note.createdAt.toISOString(),
