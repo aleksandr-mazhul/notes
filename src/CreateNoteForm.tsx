@@ -1,5 +1,7 @@
 import type { Note } from './types'
 import { type SubmitHandler, useForm } from 'react-hook-form'
+import Button from './Button.tsx'
+import styles from './CreateNoteForm.module.css'
 
 interface Props {
   onSubmit: (note: Omit<Note, 'id'>) => void
@@ -35,9 +37,10 @@ export default function CreateNoteForm({ onSubmit }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit(HandleFormSubmit)}>
-      <div>
+    <form className={styles.form} onSubmit={handleSubmit(HandleFormSubmit)}>
+      <div className={styles.field}>
         <input
+          className={styles.input}
           type="text"
           placeholder="Title"
           {...register('title', {
@@ -46,15 +49,20 @@ export default function CreateNoteForm({ onSubmit }: Props) {
             },
           })}
         />
-        {errors.title && <p>{errors.title.message}</p>}
+        {errors.title && <p className={styles.error}>{errors.title.message}</p>}
       </div>
 
-      <div>
-        <textarea placeholder="Content" {...register('content')} />
+      <div className={styles.field}>
+        <textarea
+          className={styles.input}
+          placeholder="Content"
+          {...register('content')}
+        />
       </div>
 
-      <div>
+      <div className={styles.field}>
         <input
+          className={styles.input}
           type="text"
           placeholder="Tags"
           {...register('tags', {
@@ -67,19 +75,19 @@ export default function CreateNoteForm({ onSubmit }: Props) {
             },
           })}
         />
-        {errors.tags && <p>{errors.tags.message}</p>}
+        {errors.tags && <p className={styles.error}>{errors.tags.message}</p>}
       </div>
 
-      <div>
-        <label>
+      <div className={styles.field}>
+        <label className={styles.checkbox}>
           <input type="checkbox" {...register('hidden')} />
           Hidden
         </label>
       </div>
 
-      <button type="submit" disabled={!isValid}>
+      <Button className={styles.submit} type="submit" disabled={!isValid}>
         Add Note
-      </button>
+      </Button>
     </form>
   )
 }

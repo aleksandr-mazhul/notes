@@ -1,5 +1,6 @@
 import type { Note } from './types'
 import styles from './NoteCard.module.css'
+import Button from './Button.tsx'
 
 interface Props {
   note: Note
@@ -8,18 +9,27 @@ interface Props {
 
 export default function NoteCard({ note, onDelete }: Props) {
   return (
-    <div className={styles.container}>
-      <h2>{note.title}</h2>
-      <div className={styles.row}>
-        <p>{note.createdAt.toLocaleString()}</p>
-        <p>{note.hidden ? 'Hidden' : 'Visible'}</p>
-        <div>
-          <p>Tags:</p>
-          <p>{note.tags.join(', ')}</p>
-        </div>
-      </div>
-      <p>{note.content}</p>
-      <button onClick={() => onDelete(note.id)}>Delete</button>
-    </div>
+    <article className={styles.card}>
+      <header className={styles.header}>
+        <h2 className={styles.title}>{note.title}</h2>
+        <span className={styles.status}>
+          {note.hidden ? 'Hidden' : 'Visible'}
+        </span>
+      </header>
+      <p className={styles.date}>{note.createdAt.toLocaleString()}</p>
+      {note.content && <p className={styles.content}>{note.content}</p>}
+      <footer className={styles.footer}>
+        <ul className={styles.tags}>
+          {note.tags.map((tag, index) => (
+            <li key={`${tag}-${index}`} className={styles.tag}>
+              {tag}
+            </li>
+          ))}
+        </ul>
+        <Button variant="danger" onClick={() => onDelete(note.id)}>
+          Delete
+        </Button>
+      </footer>
+    </article>
   )
 }

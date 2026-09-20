@@ -1,0 +1,31 @@
+:root {
+  --bg: #fafafa;
+  --surface: #fff;
+  --ink: #111;
+  --muted: #6b6b6b;
+  --line: #e5e5e5;
+  --line-strong: #d9d9d9;
+  --danger: #c2382f;
+  --radius: 8px;
+
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
