@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import NoteCard from './NoteCard.tsx'
 import CreateNoteForm from './CreateNoteForm.tsx'
 import { mapNoteFromDTO, mapNoteToDTO } from './utils.ts'
+import styles from './App.module.css'
 
 function App() {
   const [notes, setNotes] = useState<Note[]>([])
@@ -65,12 +66,14 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>My Notes</h1>
+    <div className={styles.app}>
+      <h1 className={styles.title}>My Notes</h1>
       <CreateNoteForm onSubmit={handleSubmit} />
-      {notes.map((note) => (
-        <NoteCard key={note.id} note={note} onDelete={handleDelete} />
-      ))}
+      <div className={styles.list}>
+        {notes.map((note) => (
+          <NoteCard key={note.id} note={note} onDelete={handleDelete} />
+        ))}
+      </div>
     </div>
   )
 }
