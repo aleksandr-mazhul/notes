@@ -9,7 +9,7 @@ export default function CreateNoteForm({onSubmit}: Props) {
   const [title, setTitle] = useState('');
   const [titleError, setTitleError] = useState('');
 
-  const [tags, setTags] = useState<string>();
+  const [tags, setTags] = useState('');
   const [tagsError, setTagsError] = useState('');
 
   const [content, setContent] = useState('');
@@ -23,22 +23,37 @@ export default function CreateNoteForm({onSubmit}: Props) {
       setTitleError('Title is required');
       return
     }
+    if (tagsError) {
+      return;
+    }
 
-    const currentTags = tags?.trim().split(' ,').map
+    const currentTags = tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+
+    if (currentTags.length > 5) {
+      setTagsError('You can only add up to 5 tags');
+      return;
+    }
+
     const note: Note = {
-      id: Date.now(),
+      id: Date.now().toString(),
       title: title.trim(),
       content: content.trim(),
       createdAt: new Date(),
       hidden: hidden,
-      tags: []
+      tags: currentTags
     };
 
     onSubmit(note);
     setTitle('');
+    setTags('');
     setContent('');
     setHidden(false);
     setTitleError('');
+
+    setTagsError('');
   }
   return (
     <form onSubmit={handleSubmit}>
@@ -56,18 +71,22 @@ export default function CreateNoteForm({onSubmit}: Props) {
         <textarea
           placeholder="Content"
           value={content}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>): void => setContent(e.target.value.split(' ,').map((tag) => tag.trim()))}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>): void => setContent(e.target.value)}
           name="content"
         />
       </div>
       <div>
         <input
-          type={text}
+          type="text"
           placeholder="Tags"
           value={tags}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setTags(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
+            setTags(e.target.value);
+            setTagsError('');
+          }}
           name="tags"
         />
+        {tagsError && <p>{tagsError}</p>}
       </div>
       <div>
         <label>

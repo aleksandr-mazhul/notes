@@ -1,41 +1,48 @@
-import type {Note} from './types';
-import {useState} from "react";
+import type {Note, NoteDTO} from './types';
+import {useEffect, useState} from "react";
 import NoteCard from "./NoteCard.tsx";
 import CreateNoteForm from "./CreateNoteForm.tsx";
+import {mapNoteFromDTO, mapNoteToDTO} from "./utils.ts";
 
 function App() {
-  const [notes, setNotes] = useState<Note[]>(() => {
-    return [
-      {
-        id: 1,
-        title: 'My first note',
-        content: 'This is the content of my first note.',
-        createdAt: new Date(),
-        hidden: false,
-        tags: ['work', 'important']
-      },
-      {
-        id: 2,
-        title: 'My second note',
-        content: 'This is the content of my second note.',
-        createdAt: new Date(),
-        hidden: true,
-        tags: ['personal', 'private']
-      },
-      {
-        id: 3,
-        title: 'My third note',
-        content: 'This is the content of my third note.',
-        createdAt: new Date(),
-        hidden: true,
-        tags: ['school', 'homework']
-      }
-    ] satisfies Note[];
-  });
+  const [notes, setNotes] = useState<Note[]>([]);
 
+  useEffect(() => {
+    fetch('http://localhost:3000/notes')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json()
+      })
+      .then((data: NoteDTO[]) => {
+        setNotes(data.map((note) => mapNoteFromDTO(note)));
+      })
+      .catch((error) => {
+        console.error('Error fetching notes:', error);
+      });
+  }, []);
 
   const handleSubmit = (note: Note) => {
-    setNotes([...notes, note]);
+    fetch('http://localhost:3000/notes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(mapNoteToDTO(note)),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data: NoteDTO) => {
+        setNotes((prevNotes) => [...prevNotes, mapNoteFromDTO(data)]);
+      })
+      .catch((error) => {
+        console.error('Error creating note:', error);
+      });
   };
 
   return (

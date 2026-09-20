@@ -45,3 +45,7 @@ test-results/
 # OS
 .DS_Store
 Thumbs.db
+
+
+#json-server
+db.json
