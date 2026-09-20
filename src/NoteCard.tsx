@@ -1,11 +1,11 @@
-import type {Note} from "./types";
-import styles from './NoteCard.module.css';
+import type { Note } from './types'
+import styles from './NoteCard.module.css'
 
 interface Props {
-  note: Note;
+  note: Note
 }
 
-export default function NoteCard({note}: Props) {
+export default function NoteCard({ note }: Props) {
   return (
     <div className={styles.container}>
       <h2>{note.title}</h2>

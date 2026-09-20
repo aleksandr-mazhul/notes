@@ -1,40 +1,40 @@
-import {useState} from "react";
-import type {Note} from './types';
+import { useState } from 'react'
+import type { Note } from './types'
 
 interface Props {
-  onSubmit: (note: Note) => void;
+  onSubmit: (note: Note) => void
 }
 
-export default function CreateNoteForm({onSubmit}: Props) {
-  const [title, setTitle] = useState('');
-  const [titleError, setTitleError] = useState('');
+export default function CreateNoteForm({ onSubmit }: Props) {
+  const [title, setTitle] = useState('')
+  const [titleError, setTitleError] = useState('')
 
-  const [tags, setTags] = useState('');
-  const [tagsError, setTagsError] = useState('');
+  const [tags, setTags] = useState('')
+  const [tagsError, setTagsError] = useState('')
 
-  const [content, setContent] = useState('');
-  const [hidden, setHidden] = useState(false);
+  const [content, setContent] = useState('')
+  const [hidden, setHidden] = useState(false)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    const currentTitle = title.trim();
+    const currentTitle = title.trim()
     if (currentTitle.length === 0) {
-      setTitleError('Title is required');
+      setTitleError('Title is required')
       return
     }
     if (tagsError) {
-      return;
+      return
     }
 
     const currentTags = tags
       .split(',')
       .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
+      .filter((tag) => tag.length > 0)
 
     if (currentTags.length > 5) {
-      setTagsError('You can only add up to 5 tags');
-      return;
+      setTagsError('You can only add up to 5 tags')
+      return
     }
 
     const note: Note = {
@@ -43,17 +43,17 @@ export default function CreateNoteForm({onSubmit}: Props) {
       content: content.trim(),
       createdAt: new Date(),
       hidden: hidden,
-      tags: currentTags
-    };
+      tags: currentTags,
+    }
 
-    onSubmit(note);
-    setTitle('');
-    setTags('');
-    setContent('');
-    setHidden(false);
-    setTitleError('');
+    onSubmit(note)
+    setTitle('')
+    setTags('')
+    setContent('')
+    setHidden(false)
+    setTitleError('')
 
-    setTagsError('');
+    setTagsError('')
   }
   return (
     <form onSubmit={handleSubmit}>
@@ -62,7 +62,9 @@ export default function CreateNoteForm({onSubmit}: Props) {
           type="text"
           placeholder="Title"
           value={title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setTitle(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
+            setTitle(e.target.value)
+          }
           name="title"
         />
         {titleError && <p>{titleError}</p>}
@@ -71,7 +73,9 @@ export default function CreateNoteForm({onSubmit}: Props) {
         <textarea
           placeholder="Content"
           value={content}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>): void => setContent(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>): void =>
+            setContent(e.target.value)
+          }
           name="content"
         />
       </div>
@@ -81,8 +85,8 @@ export default function CreateNoteForm({onSubmit}: Props) {
           placeholder="Tags"
           value={tags}
           onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
-            setTags(e.target.value);
-            setTagsError('');
+            setTags(e.target.value)
+            setTagsError('')
           }}
           name="tags"
         />
@@ -93,7 +97,9 @@ export default function CreateNoteForm({onSubmit}: Props) {
           <input
             type="checkbox"
             checked={hidden}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setHidden(e.target.checked)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
+              setHidden(e.target.checked)
+            }
             name="hidden"
           />
           Hidden
