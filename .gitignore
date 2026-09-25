@@ -48,3 +48,6 @@ Thumbs.db
 
 #json-server
 db.json
+
+# project uses npm (package-lock.json); ignore stray pnpm lockfile
+pnpm-lock.yaml
