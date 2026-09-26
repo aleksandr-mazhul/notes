@@ -5,11 +5,12 @@ import CreateNoteForm from './CreateNoteForm.tsx'
 import { mapNoteFromDTO, mapNoteToDTO } from './utils.ts'
 import styles from './App.module.css'
 
+const API_URL = 'http://localhost:3000'
 function App() {
   const [notes, setNotes] = useState<Note[]>([])
 
   useEffect(() => {
-    fetch('http://localhost:3000/notes')
+    fetch(`${API_URL}/notes`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -25,7 +26,7 @@ function App() {
   }, [])
 
   const handleSubmit = (note: Omit<Note, 'id'>) => {
-    fetch('http://localhost:3000/notes', {
+    fetch(`${API_URL}/notes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,14 +48,14 @@ function App() {
   }
 
   const handleDelete = (id: string) => {
-    fetch(`http://localhost:3000/notes/${id}`, {
+    fetch(`${API_URL}/notes/${id}`, {
       method: 'DELETE',
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
-        return fetch('http://localhost:3000/notes')
+        return fetch(`${API_URL}/notes`)
       })
       .then((response) => {
         if (!response.ok) {
