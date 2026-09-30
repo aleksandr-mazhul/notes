@@ -22,7 +22,6 @@ export default function NoteFilterForm({ onFilterChange }: Props) {
     const handleShowHiddenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setShowHidden(e.target.checked)
     }
-  }
 
   return (
     <div>
