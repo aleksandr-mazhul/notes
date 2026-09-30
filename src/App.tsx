@@ -6,6 +6,7 @@ import { mapNoteFromDTO, mapNoteToDTO } from './utils.ts'
 import styles from './App.module.css'
 import NoteFilterForm from './NoteFilterFrorm.tsx'
 
+const API_URL = 'http://localhost:3000'
 function App() {
   const [notes, setNotes] = useState<Note[]>([])
   const [filters, setFilters] = useState<NoteFilter>({
@@ -25,7 +26,7 @@ function App() {
       fn(params)
     })
 
-    fetch('http://localhost:3000/notes')
+    fetch(`${API_URL}/notes`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -41,7 +42,7 @@ function App() {
   }, [])
 
   const handleSubmit = (note: Omit<Note, 'id'>) => {
-    fetch('http://localhost:3000/notes', {
+    fetch(`${API_URL}/notes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,22 +64,29 @@ function App() {
   }
 
   const handleDelete = (id: string) => {
-    fetch(`http://localhost:3000/notes/${id}`, {
+    fetch(`${API_URL}/notes/${id}`, {
       method: 'DELETE',
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
-        setNotes((prevNotes) =>
-          prevNotes.filter((note) => {
-            return note.id !== id
-          }),
-        )
+        return fetch(`${API_URL}/notes`)
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        return response.json()
+      })
+      .then((data: NoteDTO[]) => {
+        setNotes(data.map((note) => mapNoteFromDTO(note)))
       })
       .catch((error) => {
         console.error('Error deleting note:', error)
       })
+
+
   }
 
   return (

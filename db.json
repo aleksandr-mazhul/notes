@@ -1,0 +1,27 @@
+{
+  "notes": [
+    {
+      "title": "школа",
+      "content": "-сделать алгебру\n-списать физику\n-сделать чертеж",
+      "createdAt": "2026-09-26T07:52:55.062Z",
+      "hidden": false,
+      "tags": [
+        "school",
+        "algebra"
+      ],
+      "id": "Mjcg2E4uw8M"
+    },
+    {
+      "title": "купить продукты",
+      "content": "-молоко\n-кефир\n-чифир\n-говядина",
+      "createdAt": "2026-09-26T07:54:29.712Z",
+      "hidden": true,
+      "tags": [
+        "eat",
+        "food"
+      ],
+      "id": "Qgj8CahMVvg"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
