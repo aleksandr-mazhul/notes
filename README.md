@@ -1,73 +1,39 @@
-# React + TypeScript + Vite
+# notes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small notes app in React 19 and TypeScript. Write a note, tag it, hide it from the list, delete it — all against a local REST API served by json-server.
 
-Currently, two official plugins are available:
+<img alt="notes: a form for a new note above a list of tagged notes" src="docs/screenshot.png" width="100%">
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Create notes with a title, content and up to five comma-separated tags
+- Mark a note as hidden; every card shows whether it is visible
+- Delete a note and the list refetches from the API
+- Form state and validation on `react-hook-form`
+- Dates travel as ISO strings and become `Date` objects at the edge (`mapNoteFromDTO` / `mapNoteToDTO` in `src/utils.ts`)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Run it
 
-## Expanding the ESLint configuration
+Two processes: the API and the dev server.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run db    # json-server on http://localhost:3000, data in db.json
+npm run dev   # Vite on http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+React 19 · TypeScript · Vite · react-hook-form · json-server · CSS Modules · ESLint · Prettier
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Layout
+
+```
+src/
+  App.tsx              fetch, create, delete
+  CreateNoteForm.tsx   the form and its validation
+  NoteCard.tsx         one note
+  Button.tsx           shared button
+  types.ts             Note and its wire format, NoteDTO
+  utils.ts             DTO ↔ model mapping
 ```
