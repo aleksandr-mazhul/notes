@@ -1,9 +1,9 @@
-import type { Note, NoteDTO, NoteFilter } from './types'
+import type { Note, NoteDTO, NoteFilter } from '../types'
 import { useEffect, useState } from 'react'
 import NoteCard from './NoteCard.tsx'
 import CreateNoteForm from './CreateNoteForm.tsx'
-import { mapNoteFromDTO, mapNoteToDTO } from './utils.ts'
-import styles from './App.module.css'
+import { mapNoteFromDTO, mapNoteToDTO } from '../utils.ts'
+import styles from '../styles/App.module.css'
 import NoteFilterForm from './NoteFilterFrorm.tsx'
 
 const API_URL = 'http://localhost:3000'

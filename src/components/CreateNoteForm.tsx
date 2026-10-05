@@ -1,7 +1,7 @@
-import type { Note } from './types'
+import type { Note } from '../types'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import Button from './Button.tsx'
-import styles from './CreateNoteForm.module.css'
+import styles from '../styles/CreateNoteForm.module.css'
 
 interface Props {
   onSubmit: (note: Omit<Note, 'id'>) => void

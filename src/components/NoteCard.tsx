@@ -1,5 +1,5 @@
-import type { Note } from './types'
-import styles from './NoteCard.module.css'
+import type { Note } from '../types'
+import styles from '../styles/NoteCard.module.css'
 import Button from './Button.tsx'
 
 interface Props {
