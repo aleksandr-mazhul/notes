@@ -8,19 +8,28 @@ interface Props {
 }
 
 export default function NoteFilterForm({ onFilterChange }: Props) {
-    const [search, setSearch] = useState()
+    const [search, setSearch] = useState('')
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setSearch(e.target.value)
-      onFilterChange('search', (params) => {
         onFilterChange('search', (params) => {
           params.set('search', e.target.value)
         })
-      })
     }
 
     const [showHidden, setShowHidden] = useState(true)
     const handleShowHiddenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setShowHidden(e.target.checked)
+      if (e.target.checked){
+        onFilterChange('showHidden', (params) => {
+          params.set('showHidden', e.target.checked.toString())
+        })
+      }
+      else{
+        onFilterChange('showHidden', (params) => {
+          params.set('showHidden', e.target.checked.toString())
+        })
+
+      }
     }
 
   return (

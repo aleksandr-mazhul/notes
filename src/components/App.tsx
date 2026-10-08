@@ -20,6 +20,7 @@ function App() {
     setFilters((prev) => ({ ...prev, [filter]: fn }))
   }
 
+
   useEffect(() => {
     const params = new URLSearchParams()
     Object.values(filters).forEach((fn) => {
