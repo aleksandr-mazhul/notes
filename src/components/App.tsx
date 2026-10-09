@@ -9,7 +9,11 @@ import NoteFilterForm from './NoteFilterFrorm.tsx'
 const API_URL = 'http://localhost:3000'
 function App() {
   const [notes, setNotes] = useState<Note[]>([])
-  const [filters, setFilters] = useState<NoteFilter>({})
+  const [filters, setFilters] = useState<NoteFilter>({
+    sort: (params) => {
+      params.set('_sort', '-createdAt')
+    },
+  })
 
   const handleFilterChange = (
     filter: string,
@@ -55,7 +59,7 @@ function App() {
         return response.json()
       })
       .then((data: NoteDTO) => {
-        setNotes((prevNotes) => [...prevNotes, mapNoteFromDTO(data)])
+        setNotes((prevNotes) => [mapNoteFromDTO(data), ...prevNotes])
       })
       .catch((error) => {
         console.error('Error creating note:', error)
