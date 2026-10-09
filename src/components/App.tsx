@@ -77,10 +77,16 @@ function App() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
+        return fetch(`${API_URL}/notes${buildQueryString(filters)}`)
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
         return response.json()
       })
-      .then((data: NoteDTO) => {
-        setNotes((prevNotes) => [mapNoteFromDTO(data), ...prevNotes])
+      .then((data: NoteDTO[]) => {
+        setNotes(data.map((note) => mapNoteFromDTO(note)))
       })
       .catch((error) => {
         console.error('Error creating note:', error)
