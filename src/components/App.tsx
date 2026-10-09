@@ -4,7 +4,7 @@ import NoteCard from './NoteCard.tsx'
 import CreateNoteForm from './CreateNoteForm.tsx'
 import { mapNoteFromDTO, mapNoteToDTO } from '../utils.ts'
 import styles from '../styles/App.module.css'
-import NoteFilterForm from './NoteFilterFrorm.tsx'
+import NoteFilterForm from './NoteFilterForm.tsx'
 
 const API_URL = 'http://localhost:3000'
 
