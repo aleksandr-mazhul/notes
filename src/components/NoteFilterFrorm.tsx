@@ -69,6 +69,7 @@ export default function NoteFilterForm({
         onChange={handleSearchChange}
       />
       <input
+        id="show-hidden"
         type="checkbox"
         checked={showHidden}
         onChange={handleShowHiddenChange}
