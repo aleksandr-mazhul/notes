@@ -15,6 +15,15 @@ function App() {
     },
   })
 
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const availableTags = [...new Set(notes.flatMap((note) => note.tags))]
+  const visibleNotes =
+    selectedTags.length === 0
+      ? notes
+      : notes.filter((note) =>
+          note.tags.some((tag) => selectedTags.includes(tag)),
+        )
+
   const handleFilterChange = (
     filter: string,
     fn: (params: URLSearchParams) => void,
@@ -94,9 +103,14 @@ function App() {
     <div className={styles.app}>
       <h1 className={styles.title}>My Notes</h1>
       <CreateNoteForm onSubmit={handleSubmit} />
-      <NoteFilterForm onFilterChange={handleFilterChange} />
+      <NoteFilterForm
+        onFilterChange={handleFilterChange}
+        availableTags={availableTags}
+        selectedTags={selectedTags}
+        onTagsChange={setSelectedTags}
+      />
       <div className={styles.list}>
-        {notes.map((note) => (
+        {visibleNotes.map((note) => (
           <NoteCard key={note.id} note={note} onDelete={handleDelete} />
         ))}
       </div>

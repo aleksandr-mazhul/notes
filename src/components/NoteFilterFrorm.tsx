@@ -5,9 +5,17 @@ interface Props {
     filter: string,
     fn: (params: URLSearchParams) => void,
   ) => void
+  availableTags: string[]
+  selectedTags: string[]
+  onTagsChange: (tags: string[]) => void
 }
 
-export default function NoteFilterForm({ onFilterChange }: Props) {
+export default function NoteFilterForm({
+  onFilterChange,
+  availableTags,
+  selectedTags,
+  onTagsChange,
+}: Props) {
   const [search, setSearch] = useState('')
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
@@ -34,6 +42,14 @@ export default function NoteFilterForm({ onFilterChange }: Props) {
     }
   }
 
+  const handleTagToggle = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      onTagsChange(selectedTags.filter((t) => t !== tag))
+    } else {
+      onTagsChange([...selectedTags, tag])
+    }
+  }
+
   return (
     <div>
       filters
@@ -49,6 +65,18 @@ export default function NoteFilterForm({ onFilterChange }: Props) {
         onChange={handleShowHiddenChange}
       />
       <label htmlFor="show-hidden">Show Hidden</label>
+      <div>
+        {availableTags.map((tag) => (
+          <label key={tag}>
+            <input
+              type="checkbox"
+              checked={selectedTags.includes(tag)}
+              onChange={() => handleTagToggle(tag)}
+            />
+            {tag}
+          </label>
+        ))}
+      </div>
     </div>
   )
 }
