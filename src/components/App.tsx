@@ -26,11 +26,13 @@ function App() {
 
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const availableTags = [...new Set(notes.flatMap((note) => note.tags))]
+  // a selected tag can vanish from the list (search, delete) — ignore it
+  const activeTags = selectedTags.filter((tag) => availableTags.includes(tag))
   const visibleNotes =
-    selectedTags.length === 0
+    activeTags.length === 0
       ? notes
       : notes.filter((note) =>
-          note.tags.some((tag) => selectedTags.includes(tag)),
+          note.tags.some((tag) => activeTags.includes(tag)),
         )
 
   const handleFilterChange = (
