@@ -8,29 +8,31 @@ interface Props {
 }
 
 export default function NoteFilterForm({ onFilterChange }: Props) {
-    const [search, setSearch] = useState('')
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearch(e.target.value)
-        onFilterChange('search', (params) => {
-          params.set('search', e.target.value)
-        })
-    }
+  const [search, setSearch] = useState('')
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value)
 
-    const [showHidden, setShowHidden] = useState(true)
-    const handleShowHiddenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setShowHidden(e.target.checked)
-      if (e.target.checked){
-        onFilterChange('showHidden', (params) => {
-          params.set('showHidden', e.target.checked.toString())
-        })
+    const value = e.target.value.trim()
+    onFilterChange('search', (params) => {
+      if (value) {
+        params.set('title:contains', value)
       }
-      else{
-        onFilterChange('showHidden', (params) => {
-          params.set('showHidden', e.target.checked.toString())
-        })
+    })
+  }
 
-      }
+  const [showHidden, setShowHidden] = useState(true)
+  const handleShowHiddenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShowHidden(e.target.checked)
+    if (!e.target.checked) {
+      onFilterChange('hidden', (params) => {
+        params.set('hidden', 'false')
+      })
+    } else {
+      onFilterChange('hidden', (params) => {
+        params.delete('hidden')
+      })
     }
+  }
 
   return (
     <div>

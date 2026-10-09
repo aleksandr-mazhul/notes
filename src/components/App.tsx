@@ -9,9 +9,7 @@ import NoteFilterForm from './NoteFilterFrorm.tsx'
 const API_URL = 'http://localhost:3000'
 function App() {
   const [notes, setNotes] = useState<Note[]>([])
-  const [filters, setFilters] = useState<NoteFilter>({
-    showHidden: (params) => params.set('showHidden', 'true'),
-  })
+  const [filters, setFilters] = useState<NoteFilter>({})
 
   const handleFilterChange = (
     filter: string,
@@ -20,14 +18,14 @@ function App() {
     setFilters((prev) => ({ ...prev, [filter]: fn }))
   }
 
-
   useEffect(() => {
     const params = new URLSearchParams()
     Object.values(filters).forEach((fn) => {
       fn(params)
     })
+    const queryString = params.toString() ? `?${params.toString()}` : ''
 
-    fetch(`${API_URL}/notes`)
+    fetch(`${API_URL}/notes${queryString}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -40,7 +38,7 @@ function App() {
       .catch((error) => {
         console.error('Error fetching notes:', error)
       })
-  }, [])
+  }, [filters])
 
   const handleSubmit = (note: Omit<Note, 'id'>) => {
     fetch(`${API_URL}/notes`, {
@@ -86,8 +84,6 @@ function App() {
       .catch((error) => {
         console.error('Error deleting note:', error)
       })
-
-
   }
 
   return (
