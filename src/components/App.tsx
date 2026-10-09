@@ -129,7 +129,7 @@ function App() {
         onTagsChange={setSelectedTags}
       />
       {visibleNotes.length === 0 ? (
-        <p>No notes found</p>
+        <p className={styles.empty}>No notes found</p>
       ) : (
         <div className={styles.list}>
           {visibleNotes.map((note) => (

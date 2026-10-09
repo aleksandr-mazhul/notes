@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import styles from '../styles/NoteFilterForm.module.css'
 
 interface Props {
   onFilterChange: (
@@ -60,42 +61,59 @@ export default function NoteFilterForm({
   }
 
   return (
-    <div>
-      <h2>Filters</h2>
+    <section className={styles.panel}>
+      <h2 className={styles.heading}>Filters</h2>
       <input
+        className={styles.control}
         type="text"
-        placeholder="Search..."
+        placeholder="Search by title..."
         value={search}
         onChange={handleSearchChange}
       />
-      <input
-        id="show-hidden"
-        type="checkbox"
-        checked={showHidden}
-        onChange={handleShowHiddenChange}
-      />
-      <label htmlFor="show-hidden">Show Hidden</label>
-      <label htmlFor="sort">Sort by:</label>
-      <select
-        id="sort"
-        defaultValue="newest"
-        onChange={handleCreatedAtSortChange}
-      >
-        <option value="newest">Newest</option>
-        <option value="oldest">Oldest</option>
-      </select>
-      <div>
-        {availableTags.map((tag) => (
-          <label key={tag}>
-            <input
-              type="checkbox"
-              checked={selectedTags.includes(tag)}
-              onChange={() => handleTagToggle(tag)}
-            />
-            {tag}
-          </label>
-        ))}
+      <div className={styles.row}>
+        <label className={styles.checkbox}>
+          <input
+            type="checkbox"
+            checked={showHidden}
+            onChange={handleShowHiddenChange}
+          />
+          Show hidden
+        </label>
+        <label className={styles.sort}>
+          Sort by
+          <select
+            className={styles.control}
+            defaultValue="newest"
+            onChange={handleCreatedAtSortChange}
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </label>
       </div>
-    </div>
+      {availableTags.length > 0 && (
+        <div className={styles.chips}>
+          {availableTags.map((tag) => {
+            const isSelected = selectedTags.includes(tag)
+            return (
+              <button
+                key={tag}
+                type="button"
+                className={`${styles.chip} ${isSelected ? styles.chipActive : ''}`}
+                aria-pressed={isSelected}
+                onClick={() => handleTagToggle(tag)}
+              >
+                {tag}
+                {isSelected && (
+                  <span className={styles.chipRemove} aria-hidden="true">
+                    ×
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </section>
   )
 }
