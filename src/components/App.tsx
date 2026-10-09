@@ -7,6 +7,15 @@ import styles from '../styles/App.module.css'
 import NoteFilterForm from './NoteFilterFrorm.tsx'
 
 const API_URL = 'http://localhost:3000'
+
+const buildQueryString = (filters: NoteFilter) => {
+  const params = new URLSearchParams()
+  Object.values(filters).forEach((fn) => {
+    fn(params)
+  })
+  return params.toString() ? `?${params.toString()}` : ''
+}
+
 function App() {
   const [notes, setNotes] = useState<Note[]>([])
   const [filters, setFilters] = useState<NoteFilter>({
@@ -32,13 +41,7 @@ function App() {
   }
 
   useEffect(() => {
-    const params = new URLSearchParams()
-    Object.values(filters).forEach((fn) => {
-      fn(params)
-    })
-    const queryString = params.toString() ? `?${params.toString()}` : ''
-
-    fetch(`${API_URL}/notes${queryString}`)
+    fetch(`${API_URL}/notes${buildQueryString(filters)}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
