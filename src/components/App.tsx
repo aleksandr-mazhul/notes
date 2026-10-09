@@ -26,7 +26,7 @@ function App() {
 
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const availableTags = [...new Set(notes.flatMap((note) => note.tags))]
-  // a selected tag can vanish from the list (search, delete) — ignore it
+
   const activeTags = selectedTags.filter((tag) => availableTags.includes(tag))
   const visibleNotes =
     activeTags.length === 0
@@ -43,7 +43,6 @@ function App() {
   }
 
   useEffect(() => {
-    // responses can arrive out of order when filters change quickly
     let ignore = false
 
     fetch(`${API_URL}/notes${buildQueryString(filters)}`)
