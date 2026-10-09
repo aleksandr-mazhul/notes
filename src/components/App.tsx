@@ -86,7 +86,7 @@ function App() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
-        return fetch(`${API_URL}/notes`)
+        return fetch(`${API_URL}/notes${buildQueryString(filters)}`)
       })
       .then((response) => {
         if (!response.ok) {
