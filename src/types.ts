@@ -15,3 +15,5 @@ export interface NoteDTO {
   hidden: boolean
   tags: string[]
 }
+
+export type NoteFilter = Record<string, (params: URLSearchParams) => void>
