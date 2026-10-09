@@ -41,6 +41,9 @@ function App() {
   }
 
   useEffect(() => {
+    // responses can arrive out of order when filters change quickly
+    let ignore = false
+
     fetch(`${API_URL}/notes${buildQueryString(filters)}`)
       .then((response) => {
         if (!response.ok) {
@@ -49,11 +52,17 @@ function App() {
         return response.json()
       })
       .then((data: NoteDTO[]) => {
-        setNotes(data.map((note) => mapNoteFromDTO(note)))
+        if (!ignore) {
+          setNotes(data.map((note) => mapNoteFromDTO(note)))
+        }
       })
       .catch((error) => {
         console.error('Error fetching notes:', error)
       })
+
+    return () => {
+      ignore = true
+    }
   }, [filters])
 
   const handleSubmit = (note: Omit<Note, 'id'>) => {
