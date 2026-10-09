@@ -50,9 +50,18 @@ export default function NoteFilterForm({
     }
   }
 
+  const handleCreatedAtSortChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const value = e.target.value
+    onFilterChange('sort', (params) => {
+      params.set('_sort', value === 'newest' ? '-createdAt' : 'createdAt')
+    })
+  }
+
   return (
     <div>
-      filters
+      <h2>Filters</h2>
       <input
         type="text"
         placeholder="Search..."
@@ -65,6 +74,15 @@ export default function NoteFilterForm({
         onChange={handleShowHiddenChange}
       />
       <label htmlFor="show-hidden">Show Hidden</label>
+      <label htmlFor="sort">Sort by:</label>
+      <select
+        id="sort"
+        defaultValue="newest"
+        onChange={handleCreatedAtSortChange}
+      >
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+      </select>
       <div>
         {availableTags.map((tag) => (
           <label key={tag}>
