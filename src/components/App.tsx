@@ -109,11 +109,15 @@ function App() {
         selectedTags={selectedTags}
         onTagsChange={setSelectedTags}
       />
-      <div className={styles.list}>
-        {visibleNotes.map((note) => (
-          <NoteCard key={note.id} note={note} onDelete={handleDelete} />
-        ))}
-      </div>
+      {visibleNotes.length === 0 ? (
+        <p>No notes found</p>
+      ) : (
+        <div className={styles.list}>
+          {visibleNotes.map((note) => (
+            <NoteCard key={note.id} note={note} onDelete={handleDelete} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
