@@ -5,47 +5,82 @@ import CreateNoteForm from './CreateNoteForm.tsx'
 import { mapNoteFromDTO, mapNoteToDTO } from '../utils.ts'
 import styles from '../styles/App.module.css'
 import NoteFilterForm from './NoteFilterForm.tsx'
-
+import type {NoteQuery} from '../types'
 const API_URL = 'http://localhost:3000'
 
-const buildQueryString = (filters: NoteFilter) => {
-  const params = new URLSearchParams()
+const buildQueryString = (filters: NoteFilter, tags: string[]) => {
+  const query: NoteQuery = {
+    where: {},
+  }
+
   Object.values(filters).forEach((fn) => {
-    fn(params)
+    fn(query)
   })
+
+  if (tags.length > 0) {
+    query.where.or = tags.map((tag) => ({ tags: { contains: `,${tag},` } }))
+  }
+
+  const params = new URLSearchParams()
+
+  if (Object.keys(query.where).length > 0) {
+    params.set('_where', JSON.stringify(query.where))
+  }
+
+  if (query.sort) {
+    params.set('_sort', query.sort)
+  }
+
   return params.toString() ? `?${params.toString()}` : ''
+}
+
+const  fetchAllTags = () => {
+  return fetch(`${API_URL}/notes`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      return response.json()
+    })
+    .then((data: NoteDTO[]) => {
+      const notes = data.map((note) => mapNoteFromDTO(note))
+      return [...new Set(notes.flatMap((note) => note.tags).sort((a, b) => a.localeCompare(b)))]
+    })
 }
 
 function App() {
   const [notes, setNotes] = useState<Note[]>([])
+
   const [filters, setFilters] = useState<NoteFilter>({
-    sort: (params) => {
-      params.set('_sort', '-createdAt')
+    sort: (query) => {
+      query.sort = '-createdAt'
     },
   })
 
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const availableTags = [...new Set(notes.flatMap((note) => note.tags))]
+  const [availableTags, setAvailableTags] = useState<string[]>([])
+  useEffect(() => {
+    fetchAllTags().then((tags) => {
+      setAvailableTags(tags)
+    }).catch((error) => console.error('Error fetching tags:', error))
+  }, [])
 
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const activeTags = selectedTags.filter((tag) => availableTags.includes(tag))
-  const visibleNotes =
-    activeTags.length === 0
-      ? notes
-      : notes.filter((note) =>
-          note.tags.some((tag) => activeTags.includes(tag)),
-        )
+  const queryString = buildQueryString(filters, activeTags)
+
+
+
 
   const handleFilterChange = (
     filter: string,
-    fn: (params: URLSearchParams) => void,
+    fn: (query: NoteQuery) => void,
   ) => {
     setFilters((prev) => ({ ...prev, [filter]: fn }))
   }
 
   useEffect(() => {
-    let ignore = false
-
-    fetch(`${API_URL}/notes${buildQueryString(filters)}`)
+    const controller = new AbortController()
+    fetch(`${API_URL}/notes${queryString}`, { signal: controller.signal })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -53,18 +88,20 @@ function App() {
         return response.json()
       })
       .then((data: NoteDTO[]) => {
-        if (!ignore) {
           setNotes(data.map((note) => mapNoteFromDTO(note)))
-        }
       })
       .catch((error) => {
-        console.error('Error fetching notes:', error)
+        if(error.name === 'AbortError'){
+          console.log('Fetch aborted')
+        } else {
+          console.error('Error fetching notes:', error)
+        }
       })
 
     return () => {
-      ignore = true
+      controller.abort()
     }
-  }, [filters])
+  }, [queryString])
 
   const handleSubmit = (note: Omit<Note, 'id'>) => {
     fetch(`${API_URL}/notes`, {
@@ -78,7 +115,7 @@ function App() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
-        return fetch(`${API_URL}/notes${buildQueryString(filters)}`)
+        return fetch(`${API_URL}/notes${queryString}`)
       })
       .then((response) => {
         if (!response.ok) {
@@ -88,9 +125,17 @@ function App() {
       })
       .then((data: NoteDTO[]) => {
         setNotes(data.map((note) => mapNoteFromDTO(note)))
+        return fetchAllTags()
+      })
+      .then((tags) => {
+        setAvailableTags(tags)
       })
       .catch((error) => {
-        console.error('Error creating note:', error)
+        if(error.name === 'AbortError'){
+          console.log('Fetch aborted')
+        } else {
+          console.error('Error creating note:', error)
+        }
       })
   }
 
@@ -102,7 +147,7 @@ function App() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
-        return fetch(`${API_URL}/notes${buildQueryString(filters)}`)
+        return fetch(`${API_URL}/notes${queryString}`)
       })
       .then((response) => {
         if (!response.ok) {
@@ -112,9 +157,17 @@ function App() {
       })
       .then((data: NoteDTO[]) => {
         setNotes(data.map((note) => mapNoteFromDTO(note)))
+        return fetchAllTags()
+      })
+      .then((tags) => {
+        setAvailableTags(tags)
       })
       .catch((error) => {
-        console.error('Error deleting note:', error)
+        if(error.name === 'AbortError'){
+          console.log('Fetch aborted')
+        } else {
+          console.error('Error deleting note:', error)
+        }
       })
   }
 
@@ -127,12 +180,13 @@ function App() {
         availableTags={availableTags}
         selectedTags={selectedTags}
         onTagsChange={setSelectedTags}
+        activeTags={activeTags}
       />
-      {visibleNotes.length === 0 ? (
+      {notes.length === 0 ? (
         <p className={styles.empty}>No notes found</p>
       ) : (
         <div className={styles.list}>
-          {visibleNotes.map((note) => (
+          {notes.map((note) => (
             <NoteCard key={note.id} note={note} onDelete={handleDelete} />
           ))}
         </div>

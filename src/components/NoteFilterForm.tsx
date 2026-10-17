@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import styles from '../styles/NoteFilterForm.module.css'
+import type {NoteQuery} from '../types'
 
 interface Props {
   onFilterChange: (
     filter: string,
-    fn: (params: URLSearchParams) => void,
+    fn: (query: NoteQuery) => void,
   ) => void
   availableTags: string[]
   selectedTags: string[]
   onTagsChange: (tags: string[]) => void
+  activeTags: string[]
 }
 
 export default function NoteFilterForm({
@@ -16,15 +18,16 @@ export default function NoteFilterForm({
   availableTags,
   selectedTags,
   onTagsChange,
+  activeTags,
 }: Props) {
   const [search, setSearch] = useState('')
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
 
     const value = e.target.value.trim()
-    onFilterChange('search', (params) => {
+    onFilterChange('search', (query) => {
       if (value) {
-        params.set('title:contains', value)
+        query.where.title = { contains: value }
       }
     })
   }
@@ -33,12 +36,12 @@ export default function NoteFilterForm({
   const handleShowHiddenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setShowHidden(e.target.checked)
     if (!e.target.checked) {
-      onFilterChange('hidden', (params) => {
-        params.set('hidden', 'false')
+      onFilterChange('hidden', (query) => {
+        query.where.hidden = { eq: false }
       })
     } else {
-      onFilterChange('hidden', (params) => {
-        params.delete('hidden')
+      onFilterChange('hidden', (query) => {
+        delete query.where.hidden
       })
     }
   }
@@ -55,8 +58,8 @@ export default function NoteFilterForm({
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const value = e.target.value
-    onFilterChange('sort', (params) => {
-      params.set('_sort', value === 'newest' ? '-createdAt' : 'createdAt')
+    onFilterChange('sort', (query) => {
+      query.sort = value === 'newest' ? '-createdAt' : 'createdAt'
     })
   }
 
@@ -91,6 +94,34 @@ export default function NoteFilterForm({
           </select>
         </label>
       </div>
+
+      {activeTags.length > 0 && (
+        <div className={styles.selected}>
+          <span className={styles.selectedLabel}>Selected:</span>
+          {activeTags.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              className={`${styles.chip} ${styles.chipActive}`}
+              aria-label={`Remove tag ${tag}`}
+              onClick={() => handleTagToggle(tag)}
+            >
+              {tag}
+              <span className={styles.chipRemove} aria-hidden="true">
+                ×
+              </span>
+            </button>
+
+          ))}
+          <button
+            type="button"
+            className={styles.clearButton}
+            onClick={() => onTagsChange([])}
+          >
+            Clear all
+          </button>
+        </div>
+      )}
       {availableTags.length > 0 && (
         <div className={styles.chips}>
           {availableTags.map((tag) => {
@@ -104,11 +135,6 @@ export default function NoteFilterForm({
                 onClick={() => handleTagToggle(tag)}
               >
                 {tag}
-                {isSelected && (
-                  <span className={styles.chipRemove} aria-hidden="true">
-                    ×
-                  </span>
-                )}
               </button>
             )
           })}
