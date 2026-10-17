@@ -5,22 +5,36 @@ import CreateNoteForm from './CreateNoteForm.tsx'
 import { mapNoteFromDTO, mapNoteToDTO } from '../utils.ts'
 import styles from '../styles/App.module.css'
 import NoteFilterForm from './NoteFilterForm.tsx'
-
+import type {NoteQuery} from '../types'
 const API_URL = 'http://localhost:3000'
 
 const buildQueryString = (filters: NoteFilter) => {
-  const params = new URLSearchParams()
+  const query: NoteQuery = {
+    where: {},
+  }
+
   Object.values(filters).forEach((fn) => {
-    fn(params)
+    fn(query)
   })
+
+  const params = new URLSearchParams()
+
+  if (Object.keys(query.where).length > 0) {
+    params.set('_where', JSON.stringify(query.where))
+  }
+
+  if (query.sort) {
+    params.set('_sort', query.sort)
+  }
+
   return params.toString() ? `?${params.toString()}` : ''
 }
 
 function App() {
   const [notes, setNotes] = useState<Note[]>([])
   const [filters, setFilters] = useState<NoteFilter>({
-    sort: (params) => {
-      params.set('_sort', '-createdAt')
+    sort: (query) => {
+      query.sort = '-createdAt'
     },
   })
 
@@ -37,7 +51,7 @@ function App() {
 
   const handleFilterChange = (
     filter: string,
-    fn: (params: URLSearchParams) => void,
+    fn: (query: NoteQuery) => void,
   ) => {
     setFilters((prev) => ({ ...prev, [filter]: fn }))
   }

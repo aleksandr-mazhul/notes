@@ -16,4 +16,10 @@ export interface NoteDTO {
   tags: string
 }
 
-export type NoteFilter = Record<string, (params: URLSearchParams) => void>
+
+export interface NoteQuery {
+  where: Record<string, unknown>
+  sort?: string
+}
+
+export type NoteFilter = Record<string, (query: NoteQuery) => void>

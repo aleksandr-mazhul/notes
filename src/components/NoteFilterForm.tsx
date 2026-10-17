@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import styles from '../styles/NoteFilterForm.module.css'
+import type {NoteQuery} from '../types'
 
 interface Props {
   onFilterChange: (
     filter: string,
-    fn: (params: URLSearchParams) => void,
+    fn: (query: NoteQuery) => void,
   ) => void
   availableTags: string[]
   selectedTags: string[]
@@ -22,9 +23,9 @@ export default function NoteFilterForm({
     setSearch(e.target.value)
 
     const value = e.target.value.trim()
-    onFilterChange('search', (params) => {
+    onFilterChange('search', (query) => {
       if (value) {
-        params.set('title:contains', value)
+        query.where.title = { contains: value }
       }
     })
   }
@@ -33,12 +34,12 @@ export default function NoteFilterForm({
   const handleShowHiddenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setShowHidden(e.target.checked)
     if (!e.target.checked) {
-      onFilterChange('hidden', (params) => {
-        params.set('hidden', 'false')
+      onFilterChange('hidden', (query) => {
+        query.where.hidden = { eq: false }
       })
     } else {
-      onFilterChange('hidden', (params) => {
-        params.delete('hidden')
+      onFilterChange('hidden', (query) => {
+        delete query.where.hidden
       })
     }
   }
@@ -55,8 +56,8 @@ export default function NoteFilterForm({
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const value = e.target.value
-    onFilterChange('sort', (params) => {
-      params.set('_sort', value === 'newest' ? '-createdAt' : 'createdAt')
+    onFilterChange('sort', (query) => {
+      query.sort = value === 'newest' ? '-createdAt' : 'createdAt'
     })
   }
 
