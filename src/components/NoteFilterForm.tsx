@@ -10,6 +10,7 @@ interface Props {
   availableTags: string[]
   selectedTags: string[]
   onTagsChange: (tags: string[]) => void
+  activeTags: string[]
 }
 
 export default function NoteFilterForm({
@@ -17,6 +18,7 @@ export default function NoteFilterForm({
   availableTags,
   selectedTags,
   onTagsChange,
+  activeTags,
 }: Props) {
   const [search, setSearch] = useState('')
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +94,34 @@ export default function NoteFilterForm({
           </select>
         </label>
       </div>
+
+      {activeTags.length > 0 && (
+        <div className={styles.selected}>
+          <span className={styles.selectedLabel}>Selected:</span>
+          {activeTags.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              className={`${styles.chip} ${styles.chipActive}`}
+              aria-label={`Remove tag ${tag}`}
+              onClick={() => handleTagToggle(tag)}
+            >
+              {tag}
+              <span className={styles.chipRemove} aria-hidden="true">
+                ×
+              </span>
+            </button>
+
+          ))}
+          <button
+            type="button"
+            className={styles.clearButton}
+            onClick={() => onTagsChange([])}
+          >
+            Clear all
+          </button>
+        </div>
+      )}
       {availableTags.length > 0 && (
         <div className={styles.chips}>
           {availableTags.map((tag) => {
@@ -105,11 +135,6 @@ export default function NoteFilterForm({
                 onClick={() => handleTagToggle(tag)}
               >
                 {tag}
-                {isSelected && (
-                  <span className={styles.chipRemove} aria-hidden="true">
-                    ×
-                  </span>
-                )}
               </button>
             )
           })}

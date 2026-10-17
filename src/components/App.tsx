@@ -180,6 +180,7 @@ function App() {
         availableTags={availableTags}
         selectedTags={selectedTags}
         onTagsChange={setSelectedTags}
+        activeTags={activeTags}
       />
       {notes.length === 0 ? (
         <p className={styles.empty}>No notes found</p>

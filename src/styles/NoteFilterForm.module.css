@@ -108,10 +108,15 @@
   outline-offset: 2px;
 }
 
-.chipActive,
-.chipActive:hover {
+.chipActive {
   background: var(--ink);
   border-color: var(--ink);
+  color: #fff;
+}
+
+.chipActive:hover {
+  background: #333;
+  border-color: #333;
   color: #fff;
 }
 
@@ -119,4 +124,47 @@
   font-size: 0.9375rem;
   line-height: 1;
   opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.chipActive:hover .chipRemove {
+  opacity: 1;
+}
+
+.selected {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.selectedLabel {
+  margin-right: 0.25rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.clearButton {
+  margin-left: auto;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.clearButton:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.clearButton:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
