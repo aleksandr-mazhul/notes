@@ -13,7 +13,7 @@ export interface NoteDTO {
   content: string
   createdAt: string
   hidden: boolean
-  tags: string[]
+  tags: string
 }
 
 export type NoteFilter = Record<string, (params: URLSearchParams) => void>
