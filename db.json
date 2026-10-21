@@ -1,4 +1,11 @@
 {
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@mail.com",
+      "password": "admin"
+    }
+  ],
   "notes": [
     {
       "title": "школа",
@@ -87,6 +94,22 @@
       "hidden": false,
       "tags": ",b,",
       "id": "3_z-_D-EYZY"
+    },
+    {
+      "title": "sdf",
+      "content": "sD",
+      "createdAt": "2026-10-21T11:53:04.538Z",
+      "hidden": false,
+      "tags": "",
+      "id": "HB0ttnvwc_k"
+    },
+    {
+      "title": "привет",
+      "content": "пока",
+      "createdAt": "2026-10-21T13:13:45.549Z",
+      "hidden": false,
+      "tags": ",hi,",
+      "id": "2xeZEzm_uBk"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
