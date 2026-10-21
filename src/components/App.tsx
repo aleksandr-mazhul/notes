@@ -174,7 +174,9 @@ function App() {
   return (
     <div className={styles.app}>
       <h1 className={styles.title}>My Notes</h1>
-      <CreateNoteForm onSubmit={handleSubmit} />
+      <CreateNoteForm
+        onSubmit={handleSubmit}
+      />
       <NoteFilterForm
         onFilterChange={handleFilterChange}
         availableTags={availableTags}

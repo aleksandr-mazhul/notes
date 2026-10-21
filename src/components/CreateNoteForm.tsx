@@ -5,6 +5,7 @@ import styles from '../styles/CreateNoteForm.module.css'
 
 interface Props {
   onSubmit: (note: Omit<Note, 'id'>) => void
+
 }
 
 export default function CreateNoteForm({ onSubmit }: Props) {
