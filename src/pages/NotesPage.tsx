@@ -52,7 +52,7 @@ const fetchAllTags = (authorId: string) => {
     })
 }
 
-export default function NotePage() {
+export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>([])
   const { user } = useAuthContext()
 

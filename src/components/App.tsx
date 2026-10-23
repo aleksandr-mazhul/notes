@@ -1,8 +1,9 @@
 import { createBrowserRouter, Link, RouterProvider } from 'react-router'
 import LoginPage from '../pages/LoginPage.tsx'
-import NotePage from '../pages/NotePage.tsx'
+import NotesPage from '../pages/NotesPage.tsx'
 import CreateNotePage from '../pages/CreateNotePage.tsx'
-import Layout from '../pages/Layaut.tsx'
+import NoteViewPage from '../pages/NoteViewPage.tsx'
+import Layout from '../pages/Layout.tsx'
 import { AuthProvider } from '../hooks/useAuthContext.tsx'
 
 const router = createBrowserRouter([
@@ -26,11 +27,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/notes',
-        element: <NotePage />,
+        element: <NotesPage />,
       },
       {
         path: '/notes/new',
         element: <CreateNotePage />,
+      },
+      {
+        path: '/notes/:id',
+        element: <NoteViewPage />,
       },
     ],
   },

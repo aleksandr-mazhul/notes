@@ -13,6 +13,18 @@ export function mapNoteFromDTO(note: NoteDTO): Note {
   }
 }
 
+export function fetchNote(id: string): Promise<Note | null> {
+  return fetch(`${API_URL}/notes/${id}`).then((response) => {
+    if (response.status === 404) {
+      return null
+    }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    return response.json().then((note: NoteDTO) => mapNoteFromDTO(note))
+  })
+}
+
 export function mapNoteToDTO(note: Omit<Note, 'id'>): Omit<NoteDTO, 'id'> {
   return {
     ...note,
