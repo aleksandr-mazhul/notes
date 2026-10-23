@@ -23,8 +23,13 @@ export default function LoginPage() {
 
   const handleLogin = (data: LoginFormValues) => {
     const params = new URLSearchParams()
-    params.set('email', data.email)
-    params.set('password', data.password)
+    params.set(
+      '_where',
+      JSON.stringify({
+        email: { eq: data.email },
+        password: { eq: data.password },
+      }),
+    )
 
     fetch(`http://localhost:3000/users?${params.toString()}`)
       .then((response) => {
