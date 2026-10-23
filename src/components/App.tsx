@@ -1,200 +1,63 @@
-import type { Note, NoteDTO, NoteFilter } from '../types'
-import { useEffect, useState } from 'react'
-import NoteCard from './NoteCard.tsx'
-import CreateNoteForm from './CreateNoteForm.tsx'
-import { mapNoteFromDTO, mapNoteToDTO } from '../utils.ts'
-import styles from '../styles/App.module.css'
-import NoteFilterForm from './NoteFilterForm.tsx'
-import type {NoteQuery} from '../types'
-const API_URL = 'http://localhost:3000'
+import { createBrowserRouter, Link, RouterProvider } from 'react-router'
+import LoginPage from '../pages/LoginPage.tsx'
+import RegisterPage from '../pages/RegisterPage.tsx'
+import NotesPage from '../pages/NotesPage.tsx'
+import CreateNotePage from '../pages/CreateNotePage.tsx'
+import NoteViewPage from '../pages/NoteViewPage.tsx'
+import EditNotePage from '../pages/EditNotePage.tsx'
+import Layout from '../pages/Layout.tsx'
+import AuthProvider from './AuthProvider.tsx'
 
-const buildQueryString = (filters: NoteFilter, tags: string[]) => {
-  const query: NoteQuery = {
-    where: {},
-  }
-
-  Object.values(filters).forEach((fn) => {
-    fn(query)
-  })
-
-  if (tags.length > 0) {
-    query.where.or = tags.map((tag) => ({ tags: { contains: `,${tag},` } }))
-  }
-
-  const params = new URLSearchParams()
-
-  if (Object.keys(query.where).length > 0) {
-    params.set('_where', JSON.stringify(query.where))
-  }
-
-  if (query.sort) {
-    params.set('_sort', query.sort)
-  }
-
-  return params.toString() ? `?${params.toString()}` : ''
-}
-
-const  fetchAllTags = () => {
-  return fetch(`${API_URL}/notes`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      return response.json()
-    })
-    .then((data: NoteDTO[]) => {
-      const notes = data.map((note) => mapNoteFromDTO(note))
-      return [...new Set(notes.flatMap((note) => note.tags).sort((a, b) => a.localeCompare(b)))]
-    })
-}
-
-function App() {
-  const [notes, setNotes] = useState<Note[]>([])
-
-  const [filters, setFilters] = useState<NoteFilter>({
-    sort: (query) => {
-      query.sort = '-createdAt'
-    },
-  })
-
-  const [availableTags, setAvailableTags] = useState<string[]>([])
-  useEffect(() => {
-    fetchAllTags().then((tags) => {
-      setAvailableTags(tags)
-    }).catch((error) => console.error('Error fetching tags:', error))
-  }, [])
-
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const activeTags = selectedTags.filter((tag) => availableTags.includes(tag))
-  const queryString = buildQueryString(filters, activeTags)
-
-
-
-
-  const handleFilterChange = (
-    filter: string,
-    fn: (query: NoteQuery) => void,
-  ) => {
-    setFilters((prev) => ({ ...prev, [filter]: fn }))
-  }
-
-  useEffect(() => {
-    const controller = new AbortController()
-    fetch(`${API_URL}/notes${queryString}`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data: NoteDTO[]) => {
-          setNotes(data.map((note) => mapNoteFromDTO(note)))
-      })
-      .catch((error) => {
-        if(error.name === 'AbortError'){
-          console.log('Fetch aborted')
-        } else {
-          console.error('Error fetching notes:', error)
-        }
-      })
-
-    return () => {
-      controller.abort()
-    }
-  }, [queryString])
-
-  const handleSubmit = (note: Omit<Note, 'id'>) => {
-    fetch(`${API_URL}/notes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: (
+      <div className="mx-auto flex max-w-160 items-center gap-2 px-5 pt-12">
+        home page
+        <Link className="font-medium underline" to="/login">
+          Login
+        </Link>
+        <Link className="font-medium underline" to="/register">
+          Register
+        </Link>
+      </div>
+    ),
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
+  },
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: '/notes',
+        element: <NotesPage />,
       },
-      body: JSON.stringify(mapNoteToDTO(note)),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return fetch(`${API_URL}/notes${queryString}`)
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data: NoteDTO[]) => {
-        setNotes(data.map((note) => mapNoteFromDTO(note)))
-        return fetchAllTags()
-      })
-      .then((tags) => {
-        setAvailableTags(tags)
-      })
-      .catch((error) => {
-        if(error.name === 'AbortError'){
-          console.log('Fetch aborted')
-        } else {
-          console.error('Error creating note:', error)
-        }
-      })
-  }
+      {
+        path: '/notes/new',
+        element: <CreateNotePage />,
+      },
+      {
+        path: '/notes/:id',
+        element: <NoteViewPage />,
+      },
+      {
+        path: '/notes/:id/edit',
+        element: <EditNotePage />,
+      },
+    ],
+  },
+])
 
-  const handleDelete = (id: string) => {
-    fetch(`${API_URL}/notes/${id}`, {
-      method: 'DELETE',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return fetch(`${API_URL}/notes${queryString}`)
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data: NoteDTO[]) => {
-        setNotes(data.map((note) => mapNoteFromDTO(note)))
-        return fetchAllTags()
-      })
-      .then((tags) => {
-        setAvailableTags(tags)
-      })
-      .catch((error) => {
-        if(error.name === 'AbortError'){
-          console.log('Fetch aborted')
-        } else {
-          console.error('Error deleting note:', error)
-        }
-      })
-  }
-
+export default function App() {
   return (
-    <div className={styles.app}>
-      <h1 className={styles.title}>My Notes</h1>
-      <CreateNoteForm
-        onSubmit={handleSubmit}
-      />
-      <NoteFilterForm
-        onFilterChange={handleFilterChange}
-        availableTags={availableTags}
-        selectedTags={selectedTags}
-        onTagsChange={setSelectedTags}
-        activeTags={activeTags}
-      />
-      {notes.length === 0 ? (
-        <p className={styles.empty}>No notes found</p>
-      ) : (
-        <div className={styles.list}>
-          {notes.map((note) => (
-            <NoteCard key={note.id} note={note} onDelete={handleDelete} />
-          ))}
-        </div>
-      )}
-    </div>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   )
 }
-
-export default App
