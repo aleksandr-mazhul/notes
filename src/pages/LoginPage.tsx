@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import Button from '../components/Button.tsx'
 import { cardClass, inputClass } from '../styles/ui.ts'
@@ -74,6 +74,12 @@ export default function LoginPage() {
           Login
         </Button>
       </form>
+      <p className="text-sm text-muted">
+        No account yet?{' '}
+        <Link className="font-medium text-ink underline" to="/register">
+          Register
+        </Link>
+      </p>
     </div>
   )
 }

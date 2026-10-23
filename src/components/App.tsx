@@ -1,5 +1,6 @@
 import { createBrowserRouter, Link, RouterProvider } from 'react-router'
 import LoginPage from '../pages/LoginPage.tsx'
+import RegisterPage from '../pages/RegisterPage.tsx'
 import NotesPage from '../pages/NotesPage.tsx'
 import CreateNotePage from '../pages/CreateNotePage.tsx'
 import NoteViewPage from '../pages/NoteViewPage.tsx'
@@ -16,12 +17,19 @@ const router = createBrowserRouter([
         <Link className="font-medium underline" to="/login">
           Login
         </Link>
+        <Link className="font-medium underline" to="/register">
+          Register
+        </Link>
       </div>
     ),
   },
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
   },
   {
     element: <Layout />,
