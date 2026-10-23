@@ -2,6 +2,10 @@
 
 export const cardClass = 'rounded-lg border border-line bg-surface p-5'
 
+// A hidden note sits on the page background behind a dashed border
+export const hiddenCardClass =
+  'rounded-lg border border-dashed border-line-strong bg-page p-5'
+
 export const fieldClass =
   'rounded-md border border-line-strong bg-surface text-ink transition-colors placeholder:text-muted focus:border-ink focus:outline-none'
 
