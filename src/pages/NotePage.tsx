@@ -2,9 +2,9 @@ import type { Note, NoteDTO, NoteFilter, NoteQuery } from '../types'
 import { useEffect, useState } from 'react'
 import NoteCard from '../components/NoteCard.tsx'
 import { API_URL, mapNoteFromDTO } from '../utils.ts'
-import styles from '../styles/App.module.css'
 import NoteFilterForm from '../components/NoteFilterForm.tsx'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
+import { Link } from 'react-router'
 
 const buildQueryString = (filters: NoteFilter, tags: string[]) => {
   const query: NoteQuery = {
@@ -143,24 +143,34 @@ export default function NotePage() {
   }
 
   return (
-    <div className={styles.app}>
-      <h1 className={styles.title}>My Notes</h1>
-      <NoteFilterForm
-        onFilterChange={handleFilterChange}
-        availableTags={availableTags}
-        selectedTags={selectedTags}
-        onTagsChange={setSelectedTags}
-        activeTags={activeTags}
-      />
-      {notes.length === 0 ? (
-        <p className={styles.empty}>No notes found</p>
-      ) : (
-        <div className={styles.list}>
-          {notes.map((note) => (
-            <NoteCard key={note.id} note={note} onDelete={handleDelete} />
-          ))}
-        </div>
-      )}
-    </div>
+    <>
+      <Link
+        to={'/notes/new'}
+        className="fixed bottom-5 right-5 z-50 rounded-full bg-primary px-4 py-2 text-white shadow-lg transition-transform hover:scale-105"
+      >
+        New Note
+      </Link>
+      <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
+        <h1 className="text-2xl font-semibold tracking-[-0.01em]">My Notes</h1>
+        <NoteFilterForm
+          onFilterChange={handleFilterChange}
+          availableTags={availableTags}
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
+          activeTags={activeTags}
+        />
+        {notes.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-line-strong px-4 py-10 text-center text-muted">
+            No notes found
+          </p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {notes.map((note) => (
+              <NoteCard key={note.id} note={note} onDelete={handleDelete} />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   )
 }

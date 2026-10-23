@@ -1,31 +1,42 @@
-:root {
-  --bg: #fafafa;
-  --surface: #fff;
-  --ink: #111;
-  --muted: #6b6b6b;
-  --line: #e5e5e5;
-  --line-strong: #d9d9d9;
-  --danger: #c2382f;
-  --radius: 8px;
+@import 'tailwindcss';
 
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    sans-serif;
-  color-scheme: light;
+/*
+  Design tokens. Each variable becomes a set of utilities:
+  --color-ink → bg-ink, text-ink, border-ink, …
+  --text-meta → text-meta
+*/
+@theme {
+  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-page: #fafafa;
+  --color-surface: #fff;
+  --color-ink: #111;
+  --color-ink-hover: #333;
+  --color-muted: #6b6b6b;
+  --color-line: #e5e5e5;
+  --color-line-strong: #d9d9d9;
+  --color-danger: #c2382f;
+  --color-danger-soft: #fdf1f0;
+  --color-tag: #f2f2f2;
+
+  /* The app keeps a 1.5 line height for all text, like before */
+  --text-xs--line-height: 1.5;
+  --text-sm--line-height: 1.5;
+  --text-2xl--line-height: 1.5;
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.5;
+  --text-field: 0.9375rem;
+  --text-field--line-height: 1.5;
+  --text-card-title: 1.0625rem;
+  --text-card-title--line-height: 1.5;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+@layer base {
+  :root {
+    color-scheme: light;
+  }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  body {
+    @apply bg-page text-ink antialiased;
+  }
 }

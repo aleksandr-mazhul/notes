@@ -1,6 +1,8 @@
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
+import Button from '../components/Button.tsx'
+import { cardClass, inputClass } from '../styles/ui.ts'
 
 type LoginFormValues = {
   email: string
@@ -43,22 +45,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div>
-      <div>Login page</div>
-      <form onSubmit={handleSubmit(handleLogin)}>
+    <div className="mx-auto flex max-w-sm flex-col gap-6 px-5 pt-12 pb-16">
+      <div className="text-2xl font-semibold tracking-[-0.01em]">
+        Login page
+      </div>
+      <form
+        className={`flex flex-col gap-3 ${cardClass}`}
+        onSubmit={handleSubmit(handleLogin)}
+      >
         <input
+          className={inputClass}
           type="text"
           placeholder="Email"
           {...register('email', { required: true })}
         />
         <input
+          className={inputClass}
           type="password"
           placeholder="Password"
           {...register('password', { required: true })}
         />
-        <button type="submit" disabled={!isValid}>
+        <Button className="self-end" type="submit" disabled={!isValid}>
           Login
-        </button>
+        </Button>
       </form>
     </div>
   )

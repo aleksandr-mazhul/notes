@@ -9,9 +9,11 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <div>
+      <div className="mx-auto flex max-w-160 items-center gap-2 px-5 pt-12">
         home page
-        <Link to="/login">Login</Link>
+        <Link className="font-medium underline" to="/login">
+          Login
+        </Link>
       </div>
     ),
   },
