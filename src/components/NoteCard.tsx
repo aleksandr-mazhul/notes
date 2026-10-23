@@ -1,6 +1,6 @@
 import type { Note } from '../types'
 import { Link } from 'react-router'
-import { cardClass } from '../styles/ui.ts'
+import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import Button from './Button.tsx'
 
 interface Props {
@@ -10,7 +10,13 @@ interface Props {
 
 export default function NoteCard({ note, onDelete }: Props) {
   return (
-    <article className={`flex flex-col gap-2 ${cardClass}`}>
+    <article
+      className={
+        note.hidden
+          ? `flex flex-col gap-2 ${hiddenCardClass} opacity-60 transition-opacity focus-within:opacity-100 hover:opacity-100`
+          : `flex flex-col gap-2 ${cardClass}`
+      }
+    >
       <header className="flex items-baseline justify-between gap-4">
         <h2 className="text-card-title font-semibold">
           <Link className="hover:underline" to={`/notes/${note.id}`}>

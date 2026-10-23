@@ -2,7 +2,7 @@ import type { Note } from '../types'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import Button from '../components/Button.tsx'
-import { cardClass } from '../styles/ui.ts'
+import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import { fetchNote } from '../utils.ts'
 
@@ -65,7 +65,9 @@ export default function NoteViewPage() {
   return (
     <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
       {backLink}
-      <article className={`flex flex-col gap-3 ${cardClass}`}>
+      <article
+        className={`flex flex-col gap-3 ${note.hidden ? hiddenCardClass : cardClass}`}
+      >
         <header className="flex items-baseline justify-between gap-4">
           <h1 className="text-2xl font-semibold tracking-[-0.01em] wrap-anywhere">
             {note.title}
