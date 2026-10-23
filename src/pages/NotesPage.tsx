@@ -146,7 +146,7 @@ export default function NotesPage() {
     <>
       <Link
         to={'/notes/new'}
-        className="fixed bottom-5 right-5 z-50 rounded-full bg-primary px-4 py-2 text-white shadow-lg transition-transform hover:scale-105"
+        className="fixed bottom-5 right-5 z-50 rounded-full bg-ink px-4 py-2 text-white shadow-lg transition-transform hover:scale-105"
       >
         New Note
       </Link>
