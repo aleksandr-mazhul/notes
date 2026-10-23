@@ -1,13 +1,10 @@
 import type { Note, NoteDTO, NoteFilter, NoteQuery } from '../types'
 import { useEffect, useState } from 'react'
 import NoteCard from '../components/NoteCard.tsx'
-import CreateNoteForm from '../components/CreateNoteForm.tsx'
-import { mapNoteFromDTO, mapNoteToDTO } from '../utils.ts'
+import { API_URL, mapNoteFromDTO } from '../utils.ts'
 import styles from '../styles/App.module.css'
 import NoteFilterForm from '../components/NoteFilterForm.tsx'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
-
-const API_URL = 'http://localhost:3000'
 
 const buildQueryString = (filters: NoteFilter, tags: string[]) => {
   const query: NoteQuery = {
@@ -113,42 +110,6 @@ export default function NotePage() {
     }
   }, [queryString])
 
-  const handleSubmit = (note: Omit<Note, 'id'>) => {
-    fetch(`${API_URL}/notes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(mapNoteToDTO(note)),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return fetch(`${API_URL}/notes${queryString}`)
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data: NoteDTO[]) => {
-        setNotes(data.map((note) => mapNoteFromDTO(note)))
-        return fetchAllTags(user!.id)
-      })
-      .then((tags) => {
-        setAvailableTags(tags)
-      })
-      .catch((error) => {
-        if (error.name === 'AbortError') {
-          console.log('Fetch aborted')
-        } else {
-          console.error('Error creating note:', error)
-        }
-      })
-  }
-
   const handleDelete = (id: string) => {
     fetch(`${API_URL}/notes/${id}`, {
       method: 'DELETE',
@@ -184,7 +145,6 @@ export default function NotePage() {
   return (
     <div className={styles.app}>
       <h1 className={styles.title}>My Notes</h1>
-      <CreateNoteForm onSubmit={handleSubmit} />
       <NoteFilterForm
         onFilterChange={handleFilterChange}
         availableTags={availableTags}

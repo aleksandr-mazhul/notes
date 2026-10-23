@@ -1,10 +1,15 @@
 import type { Note, NoteDTO } from './types'
 
+export const API_URL = 'http://localhost:3000'
+
 export function mapNoteFromDTO(note: NoteDTO): Note {
   return {
     ...note,
     createdAt: new Date(note.createdAt),
-    tags: note.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag !== ''),
+    tags: note.tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter((tag) => tag !== ''),
   }
 }
 

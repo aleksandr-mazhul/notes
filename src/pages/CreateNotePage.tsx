@@ -1,15 +1,14 @@
 import type { Note } from '../types'
 import { type SubmitHandler, useForm } from 'react-hook-form'
-import Button from './Button.tsx'
+import { useNavigate } from 'react-router'
+import Button from '../components/Button.tsx'
 import styles from '../styles/CreateNoteForm.module.css'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
+import { API_URL, mapNoteToDTO } from '../utils.ts'
 
-interface Props {
-  onSubmit: (note: Omit<Note, 'id'>) => void
-}
-
-export default function CreateNoteForm({ onSubmit }: Props) {
+export default function CreateNotePage() {
   const { user } = useAuthContext()
+  const navigate = useNavigate()
 
   type CreateNoteFormValues = {
     title: string
@@ -21,12 +20,11 @@ export default function CreateNoteForm({ onSubmit }: Props) {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors, isValid },
   } = useForm<CreateNoteFormValues>({ mode: 'all' })
 
   const HandleFormSubmit: SubmitHandler<CreateNoteFormValues> = (data) => {
-    onSubmit({
+    const note: Omit<Note, 'id'> = {
       title: data.title.trim(),
       authorId: user!.id,
       content: data.content.trim(),
@@ -36,8 +34,24 @@ export default function CreateNoteForm({ onSubmit }: Props) {
         .split(',')
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0),
+    }
+
+    fetch(`${API_URL}/notes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(mapNoteToDTO(note)),
     })
-    reset()
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        navigate('/notes')
+      })
+      .catch((error) => {
+        console.error('Error creating note:', error)
+      })
   }
 
   return (

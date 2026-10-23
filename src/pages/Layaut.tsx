@@ -13,6 +13,7 @@ export default function Layout() {
       <header>
         <div>
           <Link to="/notes">Notes</Link>
+          <Link to="/notes/new">New note</Link>
         </div>
         <div>
           <button onClick={() => setUser(null)}>Logout</button>
