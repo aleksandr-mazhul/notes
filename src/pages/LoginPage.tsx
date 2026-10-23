@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
+import { useAuthContext } from '../hooks/useAuthContext.tsx'
 
 type LoginFormValues = {
   email: string
@@ -7,6 +8,7 @@ type LoginFormValues = {
 }
 
 export default function LoginPage() {
+  const { setUser } = useAuthContext()
   const navigate = useNavigate()
 
   const {
@@ -31,6 +33,7 @@ export default function LoginPage() {
       })
       .then(([user]) => {
         if (user) {
+          setUser(user)
           navigate('/notes')
         }
       })

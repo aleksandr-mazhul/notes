@@ -8,108 +8,13 @@
   ],
   "notes": [
     {
-      "title": "школа",
-      "content": "-сделать алгебру\n-списать физику\n-сделать чертеж",
-      "createdAt": "2026-09-26T07:52:55.062Z",
-      "hidden": false,
-      "tags": ",school,algebra,",
-      "id": "Mjcg2E4uw8M"
-    },
-    {
-      "title": "купить продукты",
-      "content": "-молоко\n-кефир\n-чифир\n-говядина",
-      "createdAt": "2026-09-26T07:54:29.712Z",
-      "hidden": true,
-      "tags": ",eat,food,",
-      "id": "Qgj8CahMVvg"
-    },
-    {
-      "title": "12412",
-      "content": "12142142Ъ25 и 1212",
-      "createdAt": "2026-10-10T05:20:25.015Z",
-      "hidden": false,
-      "tags": "",
-      "id": "hb5QNVZ-us4"
-    },
-    {
-      "title": "вуу",
-      "content": "вв\nвв",
-      "createdAt": "2026-10-10T05:20:36.419Z",
-      "hidden": false,
-      "tags": "",
-      "id": "WumQZEfkB6k"
-    },
-    {
-      "title": "ава",
-      "content": "",
-      "createdAt": "2026-10-10T07:39:50.580Z",
-      "hidden": false,
-      "tags": ",вв,",
-      "id": "dq5q9i8jPH8"
-    },
-    {
-      "title": "ввв",
-      "content": "вв",
-      "createdAt": "2026-10-10T07:44:45.637Z",
-      "hidden": false,
-      "tags": ",eat,",
-      "id": "Ypjm9OqIYUw"
-    },
-    {
-      "title": "лр",
-      "content": "",
-      "createdAt": "2026-10-16T07:47:56.303Z",
-      "hidden": false,
-      "tags": ",зщшг,",
-      "id": "Y2YJgUQE0Bc"
-    },
-    {
-      "title": "test",
-      "content": "",
-      "createdAt": "2026-10-17T16:54:18.523Z",
-      "hidden": false,
-      "tags": ",tw,",
-      "id": "IUd3U0ESgnk"
-    },
-    {
       "title": "dd",
-      "content": "",
-      "createdAt": "2026-10-17T17:04:43.338Z",
-      "hidden": false,
-      "tags": ",d,",
-      "id": "s65awk2TvI4"
-    },
-    {
-      "title": "dd",
-      "content": "",
-      "createdAt": "2026-10-17T17:15:27.160Z",
+      "authorId": "1",
+      "content": "dd",
+      "createdAt": "2026-10-23T14:40:43.989Z",
       "hidden": false,
       "tags": ",dd,",
-      "id": "pagSbRxlnzA"
-    },
-    {
-      "title": "вв",
-      "content": "",
-      "createdAt": "2026-10-17T17:26:17.152Z",
-      "hidden": false,
-      "tags": ",b,",
-      "id": "3_z-_D-EYZY"
-    },
-    {
-      "title": "sdf",
-      "content": "sD",
-      "createdAt": "2026-10-21T11:53:04.538Z",
-      "hidden": false,
-      "tags": "",
-      "id": "HB0ttnvwc_k"
-    },
-    {
-      "title": "привет",
-      "content": "пока",
-      "createdAt": "2026-10-21T13:13:45.549Z",
-      "hidden": false,
-      "tags": ",hi,",
-      "id": "2xeZEzm_uBk"
+      "id": "hxe3dTO0GDU"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

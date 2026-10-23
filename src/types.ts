@@ -1,5 +1,6 @@
 export interface Note {
   id: string
+  authorId: string
   title: string
   content: string
   createdAt: Date
@@ -9,6 +10,7 @@ export interface Note {
 
 export interface NoteDTO {
   id: string
+  authorId: string
   title: string
   content: string
   createdAt: string
@@ -31,4 +33,5 @@ export interface User {
 
 export interface AuthContextType {
   user: User | null
+  setUser: (user: User | null) => void
 }

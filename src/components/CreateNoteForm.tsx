@@ -2,13 +2,15 @@ import type { Note } from '../types'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import Button from './Button.tsx'
 import styles from '../styles/CreateNoteForm.module.css'
+import { useAuthContext } from '../hooks/useAuthContext.tsx'
 
 interface Props {
   onSubmit: (note: Omit<Note, 'id'>) => void
-
 }
 
 export default function CreateNoteForm({ onSubmit }: Props) {
+  const { user } = useAuthContext()
+
   type CreateNoteFormValues = {
     title: string
     content: string
@@ -26,6 +28,7 @@ export default function CreateNoteForm({ onSubmit }: Props) {
   const HandleFormSubmit: SubmitHandler<CreateNoteFormValues> = (data) => {
     onSubmit({
       title: data.title.trim(),
+      authorId: user!.id,
       content: data.content.trim(),
       createdAt: new Date(),
       hidden: data.hidden,

@@ -5,6 +5,7 @@ import CreateNoteForm from '../components/CreateNoteForm.tsx'
 import { mapNoteFromDTO, mapNoteToDTO } from '../utils.ts'
 import styles from '../styles/App.module.css'
 import NoteFilterForm from '../components/NoteFilterForm.tsx'
+import { useAuthContext } from '../hooks/useAuthContext.tsx'
 
 const API_URL = 'http://localhost:3000'
 
@@ -34,8 +35,10 @@ const buildQueryString = (filters: NoteFilter, tags: string[]) => {
   return params.toString() ? `?${params.toString()}` : ''
 }
 
-const fetchAllTags = () => {
-  return fetch(`${API_URL}/notes`)
+const fetchAllTags = (authorId: string) => {
+  const params = new URLSearchParams()
+  params.set('_where', JSON.stringify({ authorId: { eq: authorId } }))
+  return fetch(`${API_URL}/notes?${params.toString()}`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -54,21 +57,25 @@ const fetchAllTags = () => {
 
 export default function NotePage() {
   const [notes, setNotes] = useState<Note[]>([])
+  const { user } = useAuthContext()
 
   const [filters, setFilters] = useState<NoteFilter>({
     sort: (query) => {
       query.sort = '-createdAt'
     },
+    authorId: (query) => {
+      query.where.authorId = { eq: user!.id }
+    },
   })
 
   const [availableTags, setAvailableTags] = useState<string[]>([])
   useEffect(() => {
-    fetchAllTags()
+    fetchAllTags(user!.id)
       .then((tags) => {
         setAvailableTags(tags)
       })
       .catch((error) => console.error('Error fetching tags:', error))
-  }, [])
+  }, [user])
 
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const activeTags = selectedTags.filter((tag) => availableTags.includes(tag))
@@ -128,7 +135,7 @@ export default function NotePage() {
       })
       .then((data: NoteDTO[]) => {
         setNotes(data.map((note) => mapNoteFromDTO(note)))
-        return fetchAllTags()
+        return fetchAllTags(user!.id)
       })
       .then((tags) => {
         setAvailableTags(tags)
@@ -160,7 +167,7 @@ export default function NotePage() {
       })
       .then((data: NoteDTO[]) => {
         setNotes(data.map((note) => mapNoteFromDTO(note)))
-        return fetchAllTags()
+        return fetchAllTags(user!.id)
       })
       .then((tags) => {
         setAvailableTags(tags)
