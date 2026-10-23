@@ -3,6 +3,7 @@ import LoginPage from '../pages/LoginPage.tsx'
 import NotesPage from '../pages/NotesPage.tsx'
 import CreateNotePage from '../pages/CreateNotePage.tsx'
 import NoteViewPage from '../pages/NoteViewPage.tsx'
+import EditNotePage from '../pages/EditNotePage.tsx'
 import Layout from '../pages/Layout.tsx'
 import { AuthProvider } from '../hooks/useAuthContext.tsx'
 
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: '/notes/:id',
         element: <NoteViewPage />,
+      },
+      {
+        path: '/notes/:id/edit',
+        element: <EditNotePage />,
       },
     ],
   },
