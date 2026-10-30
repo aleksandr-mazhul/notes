@@ -16,7 +16,6 @@ export default function EditNotePage() {
   const [note, setNote] = useState<Note | null>(null)
   const [status, setStatus] = useState<Status>('loading')
 
-  // Same loading and owner check as on the view page
   useEffect(() => {
     if (!id || !user) {
       return

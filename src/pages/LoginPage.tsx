@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import Button from '../components/Button.tsx'
 import { cardClass, inputClass } from '../styles/ui.ts'
+import {API_URL} from "../utils.ts";
 
 type LoginFormValues = {
   email: string
@@ -31,7 +32,7 @@ export default function LoginPage() {
       }),
     )
 
-    fetch(`http://localhost:3000/users?${params.toString()}`)
+    fetch(`${API_URL}/users?${params.toString()}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Network response was not ok')

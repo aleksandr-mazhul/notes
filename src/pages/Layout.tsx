@@ -8,6 +8,7 @@ export default function Layout() {
     return <Navigate to="/login" />
   }
 
+
   return (
     <div>
       <header className="mx-auto flex max-w-160 items-center justify-between px-5 pt-6">

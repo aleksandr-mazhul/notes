@@ -51,3 +51,7 @@ db.json
 
 # project uses npm (package-lock.json); ignore stray pnpm lockfile
 pnpm-lock.yaml
+
+# planning notes and docs stay local
+docs/
+PLAN.md
