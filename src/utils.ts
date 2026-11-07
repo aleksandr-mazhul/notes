@@ -2,6 +2,18 @@ import type { Note, NoteDTO } from './types'
 
 export const API_URL = 'http://localhost:3000'
 
+const noteDateFormat = new Intl.DateTimeFormat('ru-RU', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
+export function formatNoteDate(date: Date): string {
+  return noteDateFormat.format(date)
+}
+
 export function mapNoteFromDTO(note: NoteDTO): Note {
   return {
     ...note,
@@ -13,8 +25,11 @@ export function mapNoteFromDTO(note: NoteDTO): Note {
   }
 }
 
-export function fetchNote(id: string): Promise<Note | null> {
-  return fetch(`${API_URL}/notes/${id}`).then((response) => {
+export function fetchNote(
+  id: string,
+  signal?: AbortSignal,
+): Promise<Note | null> {
+  return fetch(`${API_URL}/notes/${id}`, { signal }).then((response) => {
     if (response.status === 404) {
       return null
     }

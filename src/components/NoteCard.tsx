@@ -2,6 +2,7 @@ import type { Note } from '../types'
 import { Link } from 'react-router'
 import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import Button from './Button.tsx'
+import { formatNoteDate } from '../utils.ts'
 
 interface Props {
   note: Note
@@ -27,7 +28,12 @@ export default function NoteCard({ note, onDelete }: Props) {
           {note.hidden ? 'Hidden' : 'Visible'}
         </span>
       </header>
-      <p className="text-meta text-muted">{note.createdAt.toLocaleString()}</p>
+      <time
+        className="text-meta text-muted"
+        dateTime={note.createdAt.toISOString()}
+      >
+        {formatNoteDate(note.createdAt)}
+      </time>
       {note.content && (
         <p className="mt-1 whitespace-pre-wrap wrap-anywhere">{note.content}</p>
       )}

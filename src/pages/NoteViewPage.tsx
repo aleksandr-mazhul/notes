@@ -4,36 +4,45 @@ import { Link, useNavigate, useParams } from 'react-router'
 import Button from '../components/Button.tsx'
 import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
-import { fetchNote } from '../utils.ts'
+import { fetchNote, formatNoteDate } from '../utils.ts'
 
-type Status = 'loading' | 'ready' | 'not-found'
+type State =
+  | { status: 'loading' }
+  | { status: 'not-found' }
+  | { status: 'ready'; note: Note }
 
 export default function NoteViewPage() {
   const { id } = useParams()
   const { user } = useAuthContext()
   const navigate = useNavigate()
 
-  const [note, setNote] = useState<Note | null>(null)
-  const [status, setStatus] = useState<Status>('loading')
+  const [state, setState] = useState<State>({ status: 'loading' })
 
   useEffect(() => {
     if (!id || !user) {
       return
     }
 
-    fetchNote(id)
+    const controller = new AbortController()
+    fetchNote(id, controller.signal)
       .then((fetchedNote) => {
         if (fetchedNote && fetchedNote.authorId === user.id) {
-          setNote(fetchedNote)
-          setStatus('ready')
+          setState({ status: 'ready', note: fetchedNote })
         } else {
-          setStatus('not-found')
+          setState({ status: 'not-found' })
         }
       })
       .catch((error) => {
+        if (error.name === 'AbortError') {
+          return
+        }
         console.error('Error fetching note:', error)
-        setStatus('not-found')
+        setState({ status: 'not-found' })
       })
+
+    return () => {
+      controller.abort()
+    }
   }, [id, user])
 
   const backLink = (
@@ -45,13 +54,13 @@ export default function NoteViewPage() {
     </Link>
   )
 
-  if (status === 'loading') {
+  if (state.status === 'loading') {
     return (
       <div className="mx-auto max-w-160 px-5 pt-12 text-muted">Loading…</div>
     )
   }
 
-  if (status === 'not-found' || !note) {
+  if (state.status === 'not-found') {
     return (
       <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
         {backLink}
@@ -61,6 +70,8 @@ export default function NoteViewPage() {
       </div>
     )
   }
+
+  const { note } = state
 
   return (
     <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
@@ -76,9 +87,12 @@ export default function NoteViewPage() {
             {note.hidden ? 'Hidden' : 'Visible'}
           </span>
         </header>
-        <p className="text-meta text-muted">
-          {note.createdAt.toLocaleString()}
-        </p>
+        <time
+          className="text-meta text-muted"
+          dateTime={note.createdAt.toISOString()}
+        >
+          {formatNoteDate(note.createdAt)}
+        </time>
         {note.tags.length > 0 && (
           <ul className="flex flex-wrap gap-1.5">
             {note.tags.map((tag, index) => (
