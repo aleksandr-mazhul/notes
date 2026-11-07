@@ -1,0 +1,319 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@mail.com",
+      "password": "admin"
+    },
+    {
+      "id": "2",
+      "email": "anna@mail.com",
+      "password": "anna1234"
+    },
+    {
+      "id": "3",
+      "email": "ivan@mail.com",
+      "password": "ivan1234"
+    }
+  ],
+  "notes": [
+    {
+      "id": "n001",
+      "authorId": "1",
+      "title": "Buy groceries",
+      "content": "Milk, eggs, bread, apples and coffee beans.",
+      "createdAt": "2026-09-01T08:15:00.000Z",
+      "hidden": false,
+      "tags": ",shopping,home,"
+    },
+    {
+      "id": "n002",
+      "authorId": "1",
+      "title": "Algebra homework",
+      "content": "Exercises 4.12–4.20, check the answers at the back of the book.",
+      "createdAt": "2026-09-02T17:40:00.000Z",
+      "hidden": false,
+      "tags": ",school,algebra,"
+    },
+    {
+      "id": "n003",
+      "authorId": "1",
+      "title": "Dentist appointment",
+      "content": "Thursday at 15:30, bring the insurance card.",
+      "createdAt": "2026-09-03T09:05:00.000Z",
+      "hidden": false,
+      "tags": ",health,"
+    },
+    {
+      "id": "n004",
+      "authorId": "1",
+      "title": "Gift ideas for mom",
+      "content": "Scarf, a cookbook, tickets to the theatre.",
+      "createdAt": "2026-09-04T20:10:00.000Z",
+      "hidden": true,
+      "tags": ",family,shopping,"
+    },
+    {
+      "id": "n005",
+      "authorId": "1",
+      "title": "React hooks cheat sheet",
+      "content": "useState for local state, useEffect for sync with outside systems, useMemo only when profiling says so.",
+      "createdAt": "2026-09-06T11:00:00.000Z",
+      "hidden": false,
+      "tags": ",react,frontend,study,"
+    },
+    {
+      "id": "n006",
+      "authorId": "1",
+      "title": "Where to eat on Friday",
+      "content": "Try the new ramen place near the station, or the pizza on Main street.",
+      "createdAt": "2026-09-07T19:25:00.000Z",
+      "hidden": false,
+      "tags": ",eat,friends,"
+    },
+    {
+      "id": "n007",
+      "authorId": "1",
+      "title": "Great quotes",
+      "content": "\"Simple things should be simple, complex things should be possible.\" — Alan Kay",
+      "createdAt": "2026-09-08T22:00:00.000Z",
+      "hidden": false,
+      "tags": ",great,reading,"
+    },
+    {
+      "id": "n008",
+      "authorId": "1",
+      "title": "Wi-Fi password for guests",
+      "content": "Ask before sharing. Router is in the hallway closet.",
+      "createdAt": "2026-09-10T10:30:00.000Z",
+      "hidden": true,
+      "tags": ",home,"
+    },
+    {
+      "id": "n009",
+      "authorId": "1",
+      "title": "Lab report outline",
+      "content": "Intro, method, results with two charts, discussion, references.",
+      "createdAt": "2026-09-12T14:45:00.000Z",
+      "hidden": false,
+      "tags": ",school,physics,deadline,"
+    },
+    {
+      "id": "n010",
+      "authorId": "1",
+      "title": "Morning routine",
+      "content": "Water, 10 minutes stretching, plan the day, no phone until 9.",
+      "createdAt": "2026-09-14T06:50:00.000Z",
+      "hidden": false,
+      "tags": ",health,habits,"
+    },
+    {
+      "id": "n011",
+      "authorId": "1",
+      "title": "Untagged quick thought",
+      "content": "Notes without tags should still show up when no tag chip is selected.",
+      "createdAt": "2026-09-15T12:00:00.000Z",
+      "hidden": false,
+      "tags": ""
+    },
+    {
+      "id": "n012",
+      "authorId": "1",
+      "title": "TypeScript generics",
+      "content": "function first<T>(items: T[]): T | undefined — the type flows from the argument.",
+      "createdAt": "2026-09-17T16:20:00.000Z",
+      "hidden": false,
+      "tags": ",typescript,frontend,study,"
+    },
+    {
+      "id": "n013",
+      "authorId": "1",
+      "title": "Weekend hike",
+      "content": "Trail starts at 8:00. Pack water, sandwiches, rain jacket.",
+      "createdAt": "2026-09-19T07:10:00.000Z",
+      "hidden": false,
+      "tags": ",travel,friends,sport,"
+    },
+    {
+      "id": "n014",
+      "authorId": "1",
+      "title": "Budget for October",
+      "content": "Rent, transport card, groceries, 10% to savings.",
+      "createdAt": "2026-09-28T21:35:00.000Z",
+      "hidden": true,
+      "tags": ",money,home,"
+    },
+    {
+      "id": "n015",
+      "authorId": "1",
+      "title": "Five tags at once",
+      "content": "This note uses the maximum number of tags the form allows.",
+      "createdAt": "2026-10-01T13:00:00.000Z",
+      "hidden": false,
+      "tags": ",school,react,deadline,study,frontend,"
+    },
+    {
+      "id": "n016",
+      "authorId": "1",
+      "title": "Список покупок",
+      "content": "Гречка, молоко, сыр, яблоки.",
+      "createdAt": "2026-10-03T09:40:00.000Z",
+      "hidden": false,
+      "tags": ",shopping,"
+    },
+    {
+      "id": "n017",
+      "authorId": "1",
+      "title": "Exam schedule",
+      "content": "Algebra — Dec 12, Physics — Dec 16, Web development — Dec 20.",
+      "createdAt": "2026-10-05T18:00:00.000Z",
+      "hidden": false,
+      "tags": ",school,deadline,"
+    },
+    {
+      "id": "n018",
+      "authorId": "1",
+      "title": "Movie list",
+      "content": "Arrival, Spirited Away, The Grand Budapest Hotel.",
+      "createdAt": "2026-10-08T23:15:00.000Z",
+      "hidden": false,
+      "tags": ",movies,friends,"
+    },
+    {
+      "id": "n019",
+      "authorId": "1",
+      "title": "Gym plan",
+      "content": "Mon/Wed/Fri: squats, bench, rows. 3x8.",
+      "createdAt": "2026-10-11T07:30:00.000Z",
+      "hidden": false,
+      "tags": ",sport,health,habits,"
+    },
+    {
+      "id": "n020",
+      "authorId": "1",
+      "title": "Secret project idea",
+      "content": "A tiny app that reminds you to drink water. Keep it hidden until it works.",
+      "createdAt": "2026-10-14T00:45:00.000Z",
+      "hidden": true,
+      "tags": ",ideas,"
+    },
+    {
+      "id": "n021",
+      "authorId": "1",
+      "title": "CSS grid notes",
+      "content": "grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) — responsive without media queries.",
+      "createdAt": "2026-10-18T15:05:00.000Z",
+      "hidden": false,
+      "tags": ",css,frontend,study,"
+    },
+    {
+      "id": "n022",
+      "authorId": "1",
+      "title": "Call the bank",
+      "content": "Ask about the card limit and the new statement format.",
+      "createdAt": "2026-10-22T10:00:00.000Z",
+      "hidden": false,
+      "tags": ",money,"
+    },
+    {
+      "id": "n023",
+      "authorId": "1",
+      "title": "Book club",
+      "content": "Chapter 7–9 of \"Dune\" for next Tuesday.",
+      "createdAt": "2026-10-27T20:20:00.000Z",
+      "hidden": false,
+      "tags": ",reading,friends,"
+    },
+    {
+      "id": "n024",
+      "authorId": "1",
+      "title": "Recipe: pancakes",
+      "content": "2 eggs, 250 ml milk, 150 g flour, pinch of salt, butter for the pan.",
+      "createdAt": "2026-11-02T09:00:00.000Z",
+      "hidden": false,
+      "tags": ",eat,home,"
+    },
+    {
+      "id": "n025",
+      "authorId": "1",
+      "title": "Refactor note loaders",
+      "content": "Move not-found checks into route loaders with an errorElement.",
+      "createdAt": "2026-11-05T17:55:00.000Z",
+      "hidden": false,
+      "tags": ",react,ideas,deadline,"
+    },
+    {
+      "id": "n026",
+      "authorId": "2",
+      "title": "Anna: reading list",
+      "content": "Norwegian Wood, The Little Prince, Atomic Habits.",
+      "createdAt": "2026-09-05T12:00:00.000Z",
+      "hidden": false,
+      "tags": ",reading,habits,"
+    },
+    {
+      "id": "n027",
+      "authorId": "2",
+      "title": "Anna: trip to Riga",
+      "content": "Bus on Friday night, hostel booked, museum on Saturday.",
+      "createdAt": "2026-09-20T18:30:00.000Z",
+      "hidden": false,
+      "tags": ",travel,"
+    },
+    {
+      "id": "n028",
+      "authorId": "2",
+      "title": "Anna: private diary",
+      "content": "Only Anna should ever see this one.",
+      "createdAt": "2026-10-02T22:10:00.000Z",
+      "hidden": true,
+      "tags": ",personal,"
+    },
+    {
+      "id": "n029",
+      "authorId": "2",
+      "title": "Anna: design homework",
+      "content": "Redesign a landing page in Figma, three screen sizes.",
+      "createdAt": "2026-10-16T14:00:00.000Z",
+      "hidden": false,
+      "tags": ",school,design,deadline,"
+    },
+    {
+      "id": "n030",
+      "authorId": "2",
+      "title": "Anna: no tags",
+      "content": "",
+      "createdAt": "2026-11-01T08:00:00.000Z",
+      "hidden": false,
+      "tags": ""
+    },
+    {
+      "id": "n031",
+      "authorId": "3",
+      "title": "Ivan: football Saturday",
+      "content": "Meet at the stadium at 10:00, bring the ball.",
+      "createdAt": "2026-09-13T09:30:00.000Z",
+      "hidden": false,
+      "tags": ",sport,friends,"
+    },
+    {
+      "id": "n032",
+      "authorId": "3",
+      "title": "Ivan: JS interview prep",
+      "content": "Closures, event loop, promises vs async/await, this binding.",
+      "createdAt": "2026-10-09T19:00:00.000Z",
+      "hidden": false,
+      "tags": ",javascript,frontend,study,"
+    },
+    {
+      "id": "n033",
+      "authorId": "3",
+      "title": "Ivan: car service",
+      "content": "Oil change and winter tyres before November.",
+      "createdAt": "2026-10-20T11:15:00.000Z",
+      "hidden": true,
+      "tags": ",car,money,"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
