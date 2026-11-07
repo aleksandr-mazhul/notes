@@ -1,60 +1,24 @@
-import type { Note } from '../types'
-import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import Button from '../components/Button.tsx'
 import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import { fetchNote, formatNoteDate } from '../utils.ts'
-
-type State =
-  | { status: 'loading' }
-  | { status: 'not-found' }
-  | { status: 'ready'; note: Note }
+import { useQuery } from '@tanstack/react-query'
 
 export default function NoteViewPage() {
   const { id } = useParams()
   const { user } = useAuthContext()
   const navigate = useNavigate()
 
-  const [state, setState] = useState<State>({ status: 'loading' })
-
-  useEffect(() => {
-    if (!id || !user) {
-      return
-    }
-
-    const controller = new AbortController()
-    ;(async () => {
-      const retries = 3
-      try {
-        for (let i = 0; i < retries; i++) {
-          try {
-            const fetchedNote = await fetchNote(id, controller.signal)
-            if (fetchedNote && fetchedNote.authorId === user.id) {
-              setState({ status: 'ready', note: fetchedNote })
-            } else {
-              setState({ status: 'not-found' })
-            }
-            return
-          } catch (error) {
-            if (error instanceof Error && error.name === 'AbortError') {
-              return
-            }
-            if (i === retries - 1) {
-              throw error
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching note:', error)
-        setState({ status: 'not-found' })
-      }
-    })()
-
-    return () => {
-      controller.abort()
-    }
-  }, [id, user])
+  const {
+    data: note,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ['notes', id],
+    queryFn: ({ signal }) => fetchNote(id!, signal),
+    staleTime: 5 * 60 * 1000,
+  })
 
   const backLink = (
     <Link
@@ -65,13 +29,24 @@ export default function NoteViewPage() {
     </Link>
   )
 
-  if (state.status === 'loading') {
+  if (isPending) {
     return (
       <div className="mx-auto max-w-160 px-5 pt-12 text-muted">Loading…</div>
     )
   }
 
-  if (state.status === 'not-found') {
+  if (isError) {
+    return (
+      <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
+        {backLink}
+        <p className="rounded-lg border border-dashed border-line-strong px-4 py-10 text-center text-muted">
+          Failed to load note, please try again later
+        </p>
+      </div>
+    )
+  }
+
+  if (!note || note.authorId !== user?.id) {
     return (
       <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
         {backLink}
@@ -81,8 +56,6 @@ export default function NoteViewPage() {
       </div>
     )
   }
-
-  const { note } = state
 
   return (
     <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
