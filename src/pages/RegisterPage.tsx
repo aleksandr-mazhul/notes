@@ -31,7 +31,7 @@ const createUser = (email: string, password: string): Promise<User> => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email: email, password }),
   }).then((response) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
@@ -52,16 +52,24 @@ export default function RegisterPage() {
   } = useForm<RegisterFormValues>({ mode: 'all' })
 
   const handleRegister = (values: RegisterFormValues) => {
-    findUserByEmail(values.email).then((existingUser) => {
-      if (existingUser) {
-        setError('email', { type: 'manual', message: 'Email is already taken' })
-      } else {
-        createUser(values.email, values.password).then((user) => {
-          setUser(user)
-          navigate('/notes')
-        })
-      }
-    })
+    const email= values.email.trim()
+    findUserByEmail(email)
+      .then((existingUser) => {
+        if (existingUser) {
+          setError('email', {
+            type: 'manual',
+            message: 'Email is already taken',
+          })
+        } else {
+          return createUser(email, values.password).then((user) => {
+            setUser(user)
+            navigate('/notes')
+          })
+        }
+      })
+      .catch((error) => {
+        console.error('Error registering user:', error)
+      })
   }
 
   return (
@@ -78,10 +86,7 @@ export default function RegisterPage() {
             placeholder="Email"
             {...register('email', {
               required: 'Email is required',
-              pattern: {
-                value: /^\S+@\S+\.\S+$/,
-                message: 'Enter a valid email',
-              },
+              validate: (value) => /^\S+@\S+\.\S+$/.test(value.trim()) || 'Enter a valid email',
             })}
           />
           {errors.email && (
@@ -100,7 +105,6 @@ export default function RegisterPage() {
                 value: 4,
                 message: 'Use at least 4 characters',
               },
-              // Re-check the confirmation when the password changes
               deps: 'confirmPassword',
             })}
           />

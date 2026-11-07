@@ -2,8 +2,6 @@
 
 A small notes app in React 19 and TypeScript. Write a note, tag it, hide it, find it again with search, tag and sort filters, delete it — all against a local REST API served by json-server.
 
-<img alt="notes: a form for a new note, a filter panel with search, sort and tag chips, and a list of tagged notes" src="docs/screenshot.png" width="100%">
-
 ## Features
 
 - Create notes with a title, content and up to five comma-separated tags
