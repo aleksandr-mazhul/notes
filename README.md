@@ -19,9 +19,12 @@ Two processes: the API and the dev server.
 
 ```bash
 npm install
+cp db.example.json db.json   # once: sample data, db.json itself is not in git
 npm run db    # json-server on http://localhost:3000, data in db.json
 npm run dev   # Vite on http://localhost:5173
 ```
+
+Sample accounts in `db.example.json`: `admin@mail.com` / `admin`, `anna@mail.com` / `anna1234`, `ivan@mail.com` / `ivan1234`.
 
 ## How filtering works
 
