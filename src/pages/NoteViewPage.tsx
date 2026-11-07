@@ -24,21 +24,32 @@ export default function NoteViewPage() {
     }
 
     const controller = new AbortController()
-    fetchNote(id, controller.signal)
-      .then((fetchedNote) => {
-        if (fetchedNote && fetchedNote.authorId === user.id) {
-          setState({ status: 'ready', note: fetchedNote })
-        } else {
-          setState({ status: 'not-found' })
+    ;(async () => {
+      const retries = 3
+      try {
+        for (let i = 0; i < retries; i++) {
+          try {
+            const fetchedNote = await fetchNote(id, controller.signal)
+            if (fetchedNote && fetchedNote.authorId === user.id) {
+              setState({ status: 'ready', note: fetchedNote })
+            } else {
+              setState({ status: 'not-found' })
+            }
+            return
+          } catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') {
+              return
+            }
+            if (i === retries - 1) {
+              throw error
+            }
+          }
         }
-      })
-      .catch((error) => {
-        if (error.name === 'AbortError') {
-          return
-        }
+      } catch (error) {
         console.error('Error fetching note:', error)
         setState({ status: 'not-found' })
-      })
+      }
+    })()
 
     return () => {
       controller.abort()
