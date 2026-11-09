@@ -1,10 +1,12 @@
-import type { Note, NoteDTO, NoteFilter, NoteQuery } from '../types'
+import type { NoteFilter, NoteQuery } from '../types'
 import { useEffect, useState } from 'react'
 import NoteCard from '../components/NoteCard.tsx'
-import { API_URL, mapNoteFromDTO } from '../utils.ts'
+import { API_URL } from '../utils.ts'
 import NoteFilterForm from '../components/NoteFilterForm.tsx'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import { Link } from 'react-router'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { fetchAllTags, fetchNotes } from '../api.ts'
 
 const buildQueryString = (filters: NoteFilter, tags: string[]) => {
   const query: NoteQuery = {
@@ -32,30 +34,9 @@ const buildQueryString = (filters: NoteFilter, tags: string[]) => {
   return params.toString() ? `?${params.toString()}` : ''
 }
 
-const fetchAllTags = (authorId: string) => {
-  const params = new URLSearchParams()
-  params.set('_where', JSON.stringify({ authorId: { eq: authorId } }))
-  return fetch(`${API_URL}/notes?${params.toString()}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      return response.json()
-    })
-    .then((data: NoteDTO[]) => {
-      const notes = data.map((note) => mapNoteFromDTO(note))
-      return [
-        ...new Set(
-          notes.flatMap((note) => note.tags).sort((a, b) => a.localeCompare(b)),
-        ),
-      ]
-    })
-}
-
 export default function NotesPage() {
-  const [notes, setNotes] = useState<Note[]>([])
   const { user } = useAuthContext()
-
+  const queryClient = useQueryClient()
   const [filters, setFilters] = useState<NoteFilter>({
     sort: (query) => {
       query.sort = '-createdAt'
@@ -85,30 +66,15 @@ export default function NotesPage() {
     setFilters((prev) => ({ ...prev, [filter]: fn }))
   }
 
-  useEffect(() => {
-    const controller = new AbortController()
-    fetch(`${API_URL}/notes${queryString}`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data: NoteDTO[]) => {
-        setNotes(data.map((note) => mapNoteFromDTO(note)))
-      })
-      .catch((error) => {
-        if (error.name === 'AbortError') {
-          console.log('Fetch aborted')
-        } else {
-          console.error('Error fetching notes:', error)
-        }
-      })
-
-    return () => {
-      controller.abort()
-    }
-  }, [queryString])
+  const {
+    data: notes,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ['notes', queryString],
+    queryFn: ({ signal }) => fetchNotes(queryString, signal),
+    staleTime: 5 * 60 * 1000,
+  })
 
   const handleDelete = (id: string) => {
     fetch(`${API_URL}/notes/${id}`, {
@@ -118,28 +84,31 @@ export default function NotesPage() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
-        return fetch(`${API_URL}/notes${queryString}`)
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data: NoteDTO[]) => {
-        setNotes(data.map((note) => mapNoteFromDTO(note)))
+        queryClient.invalidateQueries({ queryKey: ['notes', queryString] })
         return fetchAllTags(user!.id)
       })
       .then((tags) => {
         setAvailableTags(tags)
       })
       .catch((error) => {
-        if (error.name === 'AbortError') {
-          console.log('Fetch aborted')
-        } else {
-          console.error('Error deleting note:', error)
-        }
+        console.error('Error fetching tags after deletion:', error)
       })
+  }
+
+  if (isPending) {
+    return (
+      <div className="mx-auto max-w-160 px-5 pt-12 text-muted">Loading…</div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
+        <p className="rounded-lg border border-dashed border-line-strong px-4 py-10 text-center text-muted">
+          Failed to load notes, please try again later
+        </p>
+      </div>
+    )
   }
 
   return (

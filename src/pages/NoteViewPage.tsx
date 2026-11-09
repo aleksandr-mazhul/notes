@@ -2,8 +2,9 @@ import { Link, useNavigate, useParams } from 'react-router'
 import Button from '../components/Button.tsx'
 import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
-import { fetchNote, formatNoteDate } from '../utils.ts'
+import { formatNoteDate } from '../utils.ts'
 import { useQuery } from '@tanstack/react-query'
+import { fetchNote } from '../api.ts'
 
 export default function NoteViewPage() {
   const { id } = useParams()

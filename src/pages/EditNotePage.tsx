@@ -4,7 +4,8 @@ import { Link, useNavigate, useParams } from 'react-router'
 import NoteForm, { type NoteFormData } from '../components/NoteForm.tsx'
 import { cardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
-import { API_URL, fetchNote, mapNoteToDTO } from '../utils.ts'
+import { API_URL, mapNoteToDTO } from '../utils.ts'
+import { fetchNote } from '../api.ts'
 
 type Status = 'loading' | 'ready' | 'not-found'
 
