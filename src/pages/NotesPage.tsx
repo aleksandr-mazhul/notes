@@ -1,12 +1,11 @@
 import type { NoteFilter, NoteQuery } from '../types'
 import { useEffect, useState } from 'react'
 import NoteCard from '../components/NoteCard.tsx'
-import { API_URL } from '../utils.ts'
 import NoteFilterForm from '../components/NoteFilterForm.tsx'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import { Link } from 'react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchAllTags, fetchNotes } from '../api.ts'
+import { deleteNote, fetchAllTags, fetchNotes } from '../api.ts'
 
 const buildQueryString = (filters: NoteFilter, tags: string[]) => {
   const query: NoteQuery = {
@@ -77,13 +76,8 @@ export default function NotesPage() {
   })
 
   const handleDelete = (id: string) => {
-    fetch(`${API_URL}/notes/${id}`, {
-      method: 'DELETE',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
+    deleteNote(id)
+      .then(() => {
         queryClient.invalidateQueries({ queryKey: ['notes', queryString] })
         return fetchAllTags(user!.id)
       })
@@ -91,7 +85,7 @@ export default function NotesPage() {
         setAvailableTags(tags)
       })
       .catch((error) => {
-        console.error('Error fetching tags after deletion:', error)
+        console.error('Error deleting note:', error)
       })
   }
 

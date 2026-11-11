@@ -4,8 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 import NoteForm, { type NoteFormData } from '../components/NoteForm.tsx'
 import { cardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
-import { API_URL, mapNoteToDTO } from '../utils.ts'
-import { fetchNote } from '../api.ts'
+import { fetchNote, updateNote } from '../api.ts'
 
 type Status = 'loading' | 'ready' | 'not-found'
 
@@ -47,17 +46,8 @@ export default function EditNotePage() {
       ...data,
     }
 
-    fetch(`${API_URL}/notes/${note.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(mapNoteToDTO(updatedNote)),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
+    updateNote(updatedNote)
+      .then(() => {
         navigate(`/notes/${note.id}`)
       })
       .catch((error) => {

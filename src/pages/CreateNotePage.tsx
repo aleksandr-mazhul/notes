@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router'
 import NoteForm, { type NoteFormData } from '../components/NoteForm.tsx'
 import { cardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
-import { API_URL, mapNoteToDTO } from '../utils.ts'
+import { createNote } from '../api.ts'
 
 export default function CreateNotePage() {
   const { user } = useAuthContext()
@@ -16,22 +16,9 @@ export default function CreateNotePage() {
       createdAt: new Date(),
     } satisfies Omit<Note, 'id'>
 
-    fetch(`${API_URL}/notes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(mapNoteToDTO(note)),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        navigate('/notes')
-      })
-      .catch((error) => {
-        console.error('Error creating note:', error)
-      })
+    createNote(note)
+      .then(() => navigate('/notes'))
+      .catch((error) => console.error('Error creating note:', error))
   }
 
   return (

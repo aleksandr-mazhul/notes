@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import Button from '../components/Button.tsx'
 import { cardClass, inputClass } from '../styles/ui.ts'
-import {API_URL} from "../utils.ts";
+import { fetchUserByCredentials } from '../api.ts'
 
 type LoginFormValues = {
   email: string
@@ -23,31 +23,14 @@ export default function LoginPage() {
   })
 
   const handleLogin = (data: LoginFormValues) => {
-    const params = new URLSearchParams()
-    params.set(
-      '_where',
-      JSON.stringify({
-        email: { eq: data.email },
-        password: { eq: data.password },
-      }),
-    )
-
-    fetch(`${API_URL}/users?${params.toString()}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        return response.json()
-      })
-      .then(([user]) => {
+    fetchUserByCredentials(data.email, data.password)
+      .then((user) => {
         if (user) {
           setUser(user)
           navigate('/notes')
         }
       })
-      .catch((error) => {
-        console.error('Error:', error)
-      })
+      .catch((error) => console.error('Error:', error))
   }
 
   return (

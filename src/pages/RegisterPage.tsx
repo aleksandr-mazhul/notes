@@ -1,43 +1,14 @@
-import type { User } from '../types'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
 import Button from '../components/Button.tsx'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import { cardClass, inputClass } from '../styles/ui.ts'
-import { API_URL } from '../utils.ts'
+import { createUser, findUserByEmail } from '../api.ts'
 
 type RegisterFormValues = {
   email: string
   password: string
   confirmPassword: string
-}
-
-const findUserByEmail = (email: string): Promise<User | undefined> => {
-  const params = new URLSearchParams()
-  params.set('_where', JSON.stringify({ email: { eq: email } }))
-  return fetch(`${API_URL}/users?${params.toString()}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      return response.json()
-    })
-    .then(([user]: User[]) => user)
-}
-
-const createUser = (email: string, password: string): Promise<User> => {
-  return fetch(`${API_URL}/users`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email: email, password }),
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    return response.json()
-  })
 }
 
 export default function RegisterPage() {
@@ -52,7 +23,7 @@ export default function RegisterPage() {
   } = useForm<RegisterFormValues>({ mode: 'all' })
 
   const handleRegister = (values: RegisterFormValues) => {
-    const email= values.email.trim()
+    const email = values.email.trim()
     findUserByEmail(email)
       .then((existingUser) => {
         if (existingUser) {
@@ -86,7 +57,8 @@ export default function RegisterPage() {
             placeholder="Email"
             {...register('email', {
               required: 'Email is required',
-              validate: (value) => /^\S+@\S+\.\S+$/.test(value.trim()) || 'Enter a valid email',
+              validate: (value) =>
+                /^\S+@\S+\.\S+$/.test(value.trim()) || 'Enter a valid email',
             })}
           />
           {errors.email && (

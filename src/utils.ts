@@ -1,7 +1,5 @@
 import type { Note, NoteDTO } from './types'
 
-export const API_URL = 'http://localhost:3000'
-
 const noteDateFormat = new Intl.DateTimeFormat('ru-RU', {
   day: 'numeric',
   month: 'long',
