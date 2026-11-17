@@ -1,11 +1,11 @@
 import type { NoteFilter, NoteQuery } from '../types'
 import { useEffect, useState } from 'react'
-import NoteCard from '../components/NoteCard.tsx'
+import NoteList from '../components/NoteList.tsx'
 import NoteFilterForm from '../components/NoteFilterForm.tsx'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import { Link } from 'react-router'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { deleteNote, fetchAllTags, fetchNotes } from '../api.ts'
+import { useQueryClient } from '@tanstack/react-query'
+import { deleteNote, fetchAllTags } from '../api.ts'
 
 const buildQueryString = (filters: NoteFilter, tags: string[]) => {
   const query: NoteQuery = {
@@ -65,16 +65,6 @@ export default function NotesPage() {
     setFilters((prev) => ({ ...prev, [filter]: fn }))
   }
 
-  const {
-    data: notes,
-    isPending,
-    isError,
-  } = useQuery({
-    queryKey: ['notes', queryString],
-    queryFn: ({ signal }) => fetchNotes(queryString, signal),
-    staleTime: 5 * 60 * 1000,
-  })
-
   const handleDelete = (id: string) => {
     deleteNote(id)
       .then(() => {
@@ -87,22 +77,6 @@ export default function NotesPage() {
       .catch((error) => {
         console.error('Error deleting note:', error)
       })
-  }
-
-  if (isPending) {
-    return (
-      <div className="mx-auto max-w-160 px-5 pt-12 text-muted">Loading…</div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
-        <p className="rounded-lg border border-dashed border-line-strong px-4 py-10 text-center text-muted">
-          Failed to load notes, please try again later
-        </p>
-      </div>
-    )
   }
 
   return (
@@ -122,17 +96,7 @@ export default function NotesPage() {
           onTagsChange={setSelectedTags}
           activeTags={activeTags}
         />
-        {notes.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-line-strong px-4 py-10 text-center text-muted">
-            No notes found
-          </p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {notes.map((note) => (
-              <NoteCard key={note.id} note={note} onDelete={handleDelete} />
-            ))}
-          </div>
-        )}
+        <NoteList queryString={queryString} onDelete={handleDelete} />
       </div>
     </>
   )
