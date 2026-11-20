@@ -1,3 +1,4 @@
+import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
 import Button from '../components/Button.tsx'
@@ -22,25 +23,36 @@ export default function RegisterPage() {
     formState: { errors, isValid },
   } = useForm<RegisterFormValues>({ mode: 'all' })
 
-  const handleRegister = (values: RegisterFormValues) => {
-    const email = values.email.trim()
-    findUserByEmail(email)
-      .then((existingUser) => {
-        if (existingUser) {
-          setError('email', {
-            type: 'manual',
-            message: 'Email is already taken',
-          })
-        } else {
-          return createUser(email, values.password).then((user) => {
-            setUser(user)
-            navigate('/notes')
-          })
-        }
-      })
-      .catch((error) => {
-        console.error('Error registering user:', error)
-      })
+  const registerMutation = useMutation({
+    mutationFn: async ({
+      email,
+      password,
+    }: Pick<RegisterFormValues, 'email' | 'password'>) => {
+      const existingUser = await findUserByEmail(email)
+      if (existingUser) {
+        return null
+      }
+
+      return createUser(email, password)
+    },
+    gcTime: 0,
+    onSuccess: (user) => {
+      if (!user) {
+        setError('email', {
+          type: 'manual',
+          message: 'Email is already taken',
+        })
+        return
+      }
+
+      setUser(user)
+      navigate('/notes')
+    },
+    onError: (error) => console.error('Error registering user:', error),
+  })
+
+  const handleRegister = ({ email, password }: RegisterFormValues) => {
+    registerMutation.mutate({ email: email.trim(), password })
   }
 
   return (
@@ -102,7 +114,16 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <Button className="self-end" type="submit" disabled={!isValid}>
+        {registerMutation.isError && (
+          <p className="text-meta text-danger" role="alert">
+            Could not register. Try again.
+          </p>
+        )}
+        <Button
+          className="self-end"
+          type="submit"
+          disabled={!isValid || registerMutation.isPending}
+        >
           Register
         </Button>
       </form>

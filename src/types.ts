@@ -31,7 +31,9 @@ export interface User {
   password: string
 }
 
+export type AuthUser = Pick<User, 'id' | 'email'>
+
 export interface AuthContextType {
-  user: User | null
-  setUser: (user: User | null) => void
+  user: AuthUser | null
+  setUser: (user: AuthUser | null) => void
 }

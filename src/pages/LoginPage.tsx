@@ -1,3 +1,4 @@
+import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
@@ -19,18 +20,24 @@ export default function LoginPage() {
     handleSubmit,
     formState: { isValid },
   } = useForm<LoginFormValues>({
-    mode: 'onBlur',
+    mode: 'onChange',
+  })
+
+  const loginMutation = useMutation({
+    mutationFn: ({ email, password }: LoginFormValues) =>
+      fetchUserByCredentials(email, password),
+    gcTime: 0,
+    onSuccess: (user) => {
+      if (user) {
+        setUser(user)
+        navigate('/notes')
+      }
+    },
+    onError: (error) => console.error('Error:', error),
   })
 
   const handleLogin = (data: LoginFormValues) => {
-    fetchUserByCredentials(data.email, data.password)
-      .then((user) => {
-        if (user) {
-          setUser(user)
-          navigate('/notes')
-        }
-      })
-      .catch((error) => console.error('Error:', error))
+    loginMutation.mutate(data)
   }
 
   return (
@@ -54,7 +61,11 @@ export default function LoginPage() {
           placeholder="Password"
           {...register('password', { required: true })}
         />
-        <Button className="self-end" type="submit" disabled={!isValid}>
+        <Button
+          className="self-end"
+          type="submit"
+          disabled={!isValid || loginMutation.isPending}
+        >
           Login
         </Button>
       </form>
