@@ -4,10 +4,9 @@ import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import Button from './Button.tsx'
 import { formatNoteDate } from '../utils.ts'
 
-interface Props {
-  note: Note
-  onDelete: (id: string) => void
-}
+type Props =
+  | { note: Note; onDelete: (id: string) => void }
+  | { note: Omit<Note, 'id'>; onDelete?: never }
 
 export default function NoteCard({ note, onDelete }: Props) {
   return (
@@ -20,9 +19,13 @@ export default function NoteCard({ note, onDelete }: Props) {
     >
       <header className="flex items-baseline justify-between gap-4">
         <h2 className="text-card-title font-semibold">
-          <Link className="hover:underline" to={`/notes/${note.id}`}>
-            {note.title}
-          </Link>
+          {onDelete ? (
+            <Link className="hover:underline" to={`/notes/${note.id}`}>
+              {note.title}
+            </Link>
+          ) : (
+            note.title
+          )}
         </h2>
         <span className="text-meta text-muted">
           {note.hidden ? 'Hidden' : 'Visible'}
@@ -48,9 +51,11 @@ export default function NoteCard({ note, onDelete }: Props) {
             </li>
           ))}
         </ul>
-        <Button variant="danger" onClick={() => onDelete(note.id)}>
-          Delete
-        </Button>
+        {onDelete && (
+          <Button variant="danger" onClick={() => onDelete(note.id)}>
+            Delete
+          </Button>
+        )}
       </footer>
     </article>
   )

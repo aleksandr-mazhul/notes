@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
 import {
   cardClass,
   checkboxLabelClass,
   fieldClass,
   inputClass,
 } from '../styles/ui.ts'
-import type { NoteQuery } from '../types'
+import type { NoteFilter } from '../types'
 
 const chipClass =
   'inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-meta leading-[1.4] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink'
@@ -15,61 +14,25 @@ const chipActiveClass =
   'border-ink bg-ink text-white hover:border-ink-hover hover:bg-ink-hover'
 
 interface Props {
-  onFilterChange: (filter: string, fn: (query: NoteQuery) => void) => void
+  filters: NoteFilter
+  onFilterChange: (filters: NoteFilter) => void
   availableTags: string[]
-  selectedTags: string[]
-  onTagsChange: (tags: string[]) => void
   activeTags: string[]
 }
 
 export default function NoteFilterForm({
+  filters,
   onFilterChange,
   availableTags,
-  selectedTags,
-  onTagsChange,
   activeTags,
 }: Props) {
-  const [search, setSearch] = useState('')
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value)
-
-    const value = e.target.value.trim()
-    onFilterChange('search', (query) => {
-      if (value) {
-        query.where.title = { contains: value }
-      }
-    })
-  }
-
-  const [showHidden, setShowHidden] = useState(true)
-  const handleShowHiddenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setShowHidden(e.target.checked)
-    if (!e.target.checked) {
-      onFilterChange('hidden', (query) => {
-        query.where.hidden = { eq: false }
-      })
-    } else {
-      onFilterChange('hidden', (query) => {
-        delete query.where.hidden
-      })
-    }
-  }
+  const { search, showHidden, sort, selectedTags } = filters
 
   const handleTagToggle = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      onTagsChange(selectedTags.filter((t) => t !== tag))
-    } else {
-      onTagsChange([...selectedTags, tag])
-    }
-  }
-
-  const handleCreatedAtSortChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const value = e.target.value
-    onFilterChange('sort', (query) => {
-      query.sort = value === 'newest' ? '-createdAt' : 'createdAt'
-    })
+    const nextTags = selectedTags.includes(tag)
+      ? selectedTags.filter((selectedTag) => selectedTag !== tag)
+      : [...selectedTags, tag]
+    onFilterChange({ ...filters, selectedTags: nextTags })
   }
 
   return (
@@ -82,7 +45,9 @@ export default function NoteFilterForm({
         type="text"
         placeholder="Search by title..."
         value={search}
-        onChange={handleSearchChange}
+        onChange={(event) =>
+          onFilterChange({ ...filters, search: event.target.value })
+        }
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label className={checkboxLabelClass}>
@@ -90,7 +55,9 @@ export default function NoteFilterForm({
             className="accent-ink"
             type="checkbox"
             checked={showHidden}
-            onChange={handleShowHiddenChange}
+            onChange={(event) =>
+              onFilterChange({ ...filters, showHidden: event.target.checked })
+            }
           />
           Show hidden
         </label>
@@ -98,8 +65,13 @@ export default function NoteFilterForm({
           Sort by
           <select
             className={`${fieldClass} cursor-pointer px-2 py-1.5 text-sm`}
-            defaultValue="newest"
-            onChange={handleCreatedAtSortChange}
+            value={sort}
+            onChange={(event) =>
+              onFilterChange({
+                ...filters,
+                sort: event.target.value === 'oldest' ? 'oldest' : 'newest',
+              })
+            }
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -130,7 +102,7 @@ export default function NoteFilterForm({
           <button
             type="button"
             className="ml-auto cursor-pointer rounded-sm text-meta text-muted transition-colors hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-            onClick={() => onTagsChange([])}
+            onClick={() => onFilterChange({ ...filters, selectedTags: [] })}
           >
             Clear all
           </button>

@@ -3,7 +3,12 @@ import { mapNoteFromDTO, mapNoteToDTO } from './utils.ts'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-const NOTES_PER_PAGE = 10
+const NOTES_PER_PAGE = 2
+
+export type NotesPageResult = { data: Note[]; next: number | null }
+
+export const notesListQueryKey = (queryString: string) =>
+  ['notes', 'list', queryString] as const
 
 export const fetchAllTags = (authorId: string, signal?: AbortSignal) => {
   const params = new URLSearchParams()
@@ -37,20 +42,18 @@ export function fetchNote(
 
 export async function fetchNotes(
   queryString: string,
-  page?: number,
+  page: number,
   signal?: AbortSignal,
-): Promise<Note[]> {
-  if (page === undefined) {
-    const notes = await get<NoteDTO[]>(`/notes${queryString}`, signal)
-    return notes.map(mapNoteFromDTO)
-  }
-
+): Promise<NotesPageResult> {
   const params = new URLSearchParams(queryString)
   params.set('_page', page.toString())
   params.set('_per_page', NOTES_PER_PAGE.toString())
 
-  const result = await get<{ data: NoteDTO[] }>(`/notes?${params}`, signal)
-  return result.data.map(mapNoteFromDTO)
+  const result = await get<{ data: NoteDTO[]; next: number | null }>(
+    `/notes?${params}`,
+    signal,
+  )
+  return { data: result.data.map(mapNoteFromDTO), next: result.next }
 }
 
 export function fetchUserByCredentials(

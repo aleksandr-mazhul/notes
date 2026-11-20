@@ -3,13 +3,18 @@ import Button from '../components/Button.tsx'
 import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import { formatNoteDate } from '../utils.ts'
-import { useQuery } from '@tanstack/react-query'
+import { useMutationState, useQuery } from '@tanstack/react-query'
 import { fetchNote } from '../api.ts'
 
 export default function NoteViewPage() {
   const { id } = useParams()
   const { user } = useAuthContext()
   const navigate = useNavigate()
+  const updateStatuses = useMutationState({
+    filters: { mutationKey: ['notes', 'update', id], exact: true },
+    select: ({ state }) => state.status,
+  })
+  const updateStatus = updateStatuses.at(-1)
 
   const {
     data: note,
@@ -61,6 +66,16 @@ export default function NoteViewPage() {
   return (
     <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
       {backLink}
+      {updateStatus === 'pending' && (
+        <p className="text-sm text-muted" role="status">
+          Saving changes…
+        </p>
+      )}
+      {updateStatus === 'error' && (
+        <p className="text-sm text-danger" role="alert">
+          Could not save changes. Edit the note to try again.
+        </p>
+      )}
       <article
         className={`flex flex-col gap-3 ${note.hidden ? hiddenCardClass : cardClass}`}
       >
@@ -96,7 +111,10 @@ export default function NoteViewPage() {
           <p className="text-muted">No content</p>
         )}
         <footer className="mt-2 flex justify-end">
-          <Button onClick={() => navigate(`/notes/${note.id}/edit`)}>
+          <Button
+            disabled={updateStatus === 'pending'}
+            onClick={() => navigate(`/notes/${note.id}/edit`)}
+          >
             Edit
           </Button>
         </footer>

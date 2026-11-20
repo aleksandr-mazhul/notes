@@ -23,7 +23,12 @@ export interface NoteQuery {
   sort?: string
 }
 
-export type NoteFilter = Record<string, (query: NoteQuery) => void>
+export interface NoteFilter {
+  search: string
+  showHidden: boolean
+  sort: 'newest' | 'oldest'
+  selectedTags: string[]
+}
 
 export interface User {
   id: string

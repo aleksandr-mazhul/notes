@@ -15,12 +15,14 @@ export type NoteFormData = Pick<Note, 'title' | 'content' | 'tags' | 'hidden'>
 interface Props {
   defaultValues?: NoteFormData
   submitLabel: string
+  submitDisabled?: boolean
   onSubmit: (data: NoteFormData) => void
 }
 
 export default function NoteForm({
   defaultValues,
   submitLabel,
+  submitDisabled = false,
   onSubmit,
 }: Props) {
   const {
@@ -108,7 +110,11 @@ export default function NoteForm({
         </label>
       </div>
 
-      <Button className="self-end" type="submit" disabled={!isValid}>
+      <Button
+        className="self-end"
+        type="submit"
+        disabled={!isValid || submitDisabled}
+      >
         {submitLabel}
       </Button>
     </form>
