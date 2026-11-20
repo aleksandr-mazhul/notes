@@ -1,40 +1,30 @@
-import type { Note } from '../types'
-import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import Button from '../components/Button.tsx'
 import { cardClass, hiddenCardClass } from '../styles/ui.ts'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
-import { fetchNote } from '../utils.ts'
-
-type Status = 'loading' | 'ready' | 'not-found'
+import { formatNoteDate } from '../utils.ts'
+import { useMutationState, useQuery } from '@tanstack/react-query'
+import { fetchNote } from '../api.ts'
 
 export default function NoteViewPage() {
   const { id } = useParams()
   const { user } = useAuthContext()
   const navigate = useNavigate()
+  const updateStatuses = useMutationState({
+    filters: { mutationKey: ['notes', 'update', id], exact: true },
+    select: ({ state }) => state.status,
+  })
+  const updateStatus = updateStatuses.at(-1)
 
-  const [note, setNote] = useState<Note | null>(null)
-  const [status, setStatus] = useState<Status>('loading')
-
-  useEffect(() => {
-    if (!id || !user) {
-      return
-    }
-
-    fetchNote(id)
-      .then((fetchedNote) => {
-        if (fetchedNote && fetchedNote.authorId === user.id) {
-          setNote(fetchedNote)
-          setStatus('ready')
-        } else {
-          setStatus('not-found')
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching note:', error)
-        setStatus('not-found')
-      })
-  }, [id, user])
+  const {
+    data: note,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ['notes', id],
+    queryFn: ({ signal }) => fetchNote(id!, signal),
+    staleTime: 5 * 60 * 1000,
+  })
 
   const backLink = (
     <Link
@@ -45,13 +35,24 @@ export default function NoteViewPage() {
     </Link>
   )
 
-  if (status === 'loading') {
+  if (isPending) {
     return (
       <div className="mx-auto max-w-160 px-5 pt-12 text-muted">Loading…</div>
     )
   }
 
-  if (status === 'not-found' || !note) {
+  if (isError) {
+    return (
+      <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
+        {backLink}
+        <p className="rounded-lg border border-dashed border-line-strong px-4 py-10 text-center text-muted">
+          Failed to load note, please try again later
+        </p>
+      </div>
+    )
+  }
+
+  if (!note || note.authorId !== user?.id) {
     return (
       <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
         {backLink}
@@ -65,6 +66,16 @@ export default function NoteViewPage() {
   return (
     <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
       {backLink}
+      {updateStatus === 'pending' && (
+        <p className="text-sm text-muted" role="status">
+          Saving changes…
+        </p>
+      )}
+      {updateStatus === 'error' && (
+        <p className="text-sm text-danger" role="alert">
+          Could not save changes. Edit the note to try again.
+        </p>
+      )}
       <article
         className={`flex flex-col gap-3 ${note.hidden ? hiddenCardClass : cardClass}`}
       >
@@ -76,9 +87,12 @@ export default function NoteViewPage() {
             {note.hidden ? 'Hidden' : 'Visible'}
           </span>
         </header>
-        <p className="text-meta text-muted">
-          {note.createdAt.toLocaleString()}
-        </p>
+        <time
+          className="text-meta text-muted"
+          dateTime={note.createdAt.toISOString()}
+        >
+          {formatNoteDate(note.createdAt)}
+        </time>
         {note.tags.length > 0 && (
           <ul className="flex flex-wrap gap-1.5">
             {note.tags.map((tag, index) => (
@@ -97,7 +111,10 @@ export default function NoteViewPage() {
           <p className="text-muted">No content</p>
         )}
         <footer className="mt-2 flex justify-end">
-          <Button onClick={() => navigate(`/notes/${note.id}/edit`)}>
+          <Button
+            disabled={updateStatus === 'pending'}
+            onClick={() => navigate(`/notes/${note.id}/edit`)}
+          >
             Edit
           </Button>
         </footer>

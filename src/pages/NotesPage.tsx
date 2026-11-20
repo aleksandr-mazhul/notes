@@ -1,19 +1,56 @@
-import type { Note, NoteDTO, NoteFilter, NoteQuery } from '../types'
+import type { NoteFilter, NoteQuery } from '../types'
 import { useEffect, useState } from 'react'
-import NoteCard from '../components/NoteCard.tsx'
-import { API_URL, mapNoteFromDTO } from '../utils.ts'
+import NoteList from '../components/NoteList.tsx'
 import NoteFilterForm from '../components/NoteFilterForm.tsx'
 import { useAuthContext } from '../hooks/useAuthContext.tsx'
 import { Link } from 'react-router'
+import {
+  type InfiniteData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
+import {
+  deleteNote,
+  fetchAllTags,
+  notesListQueryKey,
+  type NotesPageResult,
+} from '../api.ts'
 
-const buildQueryString = (filters: NoteFilter, tags: string[]) => {
-  const query: NoteQuery = {
-    where: {},
+function readFilters(storageKey: string): NoteFilter {
+  let savedFilters: string | null
+  try {
+    savedFilters = sessionStorage.getItem(storageKey)
+  } catch {
+    savedFilters = null
   }
 
-  Object.values(filters).forEach((fn) => {
-    fn(query)
-  })
+  const params = new URLSearchParams(savedFilters ?? '')
+  return {
+    search: params.get('search') ?? '',
+    showHidden: params.get('showHidden') !== 'false',
+    sort: params.get('sort') === 'oldest' ? 'oldest' : 'newest',
+    selectedTags: params.getAll('tag'),
+  }
+}
+
+const buildQueryString = (
+  filters: NoteFilter,
+  tags: string[],
+  authorId: string,
+) => {
+  const query: NoteQuery = {
+    where: { authorId: { eq: authorId } },
+    sort: filters.sort === 'newest' ? '-createdAt,id' : 'createdAt,id',
+  }
+
+  const search = filters.search.trim()
+  if (search) {
+    query.where.title = { contains: search }
+  }
+  if (!filters.showHidden) {
+    query.where.hidden = { eq: false }
+  }
 
   if (tags.length > 0) {
     query.where.or = tags.map((tag) => ({ tags: { contains: `,${tag},` } }))
@@ -32,114 +69,105 @@ const buildQueryString = (filters: NoteFilter, tags: string[]) => {
   return params.toString() ? `?${params.toString()}` : ''
 }
 
-const fetchAllTags = (authorId: string) => {
-  const params = new URLSearchParams()
-  params.set('_where', JSON.stringify({ authorId: { eq: authorId } }))
-  return fetch(`${API_URL}/notes?${params.toString()}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      return response.json()
-    })
-    .then((data: NoteDTO[]) => {
-      const notes = data.map((note) => mapNoteFromDTO(note))
-      return [
-        ...new Set(
-          notes.flatMap((note) => note.tags).sort((a, b) => a.localeCompare(b)),
-        ),
-      ]
-    })
-}
-
 export default function NotesPage() {
-  const [notes, setNotes] = useState<Note[]>([])
   const { user } = useAuthContext()
+  const queryClient = useQueryClient()
+  const userId = user!.id
+  const storageKey = `notes:filters:${userId}`
+  const [filters, setFilters] = useState(() => readFilters(storageKey))
+  const { data: availableTags } = useQuery({
+    queryKey: ['notes', 'tags', userId],
+    queryFn: ({ signal }) => fetchAllTags(userId, signal),
+    staleTime: 5 * 60 * 1000,
+  })
+  const activeTags = availableTags
+    ? filters.selectedTags.filter((tag) => availableTags.includes(tag))
+    : filters.selectedTags
+  const queryString = buildQueryString(filters, activeTags, userId)
 
-  const [filters, setFilters] = useState<NoteFilter>({
-    sort: (query) => {
-      query.sort = '-createdAt'
+  useEffect(() => {
+    const params = new URLSearchParams({
+      search: filters.search,
+      showHidden: String(filters.showHidden),
+      sort: filters.sort,
+    })
+    filters.selectedTags.forEach((tag) => params.append('tag', tag))
+
+    try {
+      sessionStorage.setItem(storageKey, params.toString())
+    } catch {
+      return
+    }
+  }, [filters, storageKey])
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteNote,
+    onMutate: async (id) => {
+      const queryKey = notesListQueryKey(queryString)
+      await queryClient.cancelQueries({ queryKey, exact: true })
+
+      const previousNotes =
+        queryClient.getQueryData<InfiniteData<NotesPageResult, number>>(
+          queryKey,
+        )
+      queryClient.setQueryData<InfiniteData<NotesPageResult, number>>(
+        queryKey,
+        (current) =>
+          current && {
+            ...current,
+            pages: current.pages.map((page) => ({
+              ...page,
+              data: page.data.filter((note) => note.id !== id),
+            })),
+          },
+      )
+      return { queryKey, previousNotes }
     },
-    authorId: (query) => {
-      query.where.authorId = { eq: user!.id }
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['notes'] }),
+    onError: (error, id, snapshot) => {
+      console.error('Error deleting note:', error)
+      if (!snapshot?.previousNotes) {
+        return
+      }
+
+      const { queryKey, previousNotes } = snapshot
+      const pageIndex = previousNotes.pages.findIndex((page) =>
+        page.data.some((note) => note.id === id),
+      )
+      const previousPage = previousNotes.pages[pageIndex]
+      if (!previousPage) {
+        return
+      }
+
+      const noteIndex = previousPage.data.findIndex((note) => note.id === id)
+      const note = previousPage.data[noteIndex]
+      queryClient.setQueryData<InfiniteData<NotesPageResult, number>>(
+        queryKey,
+        (current) => {
+          if (
+            !current ||
+            current.pages.some((page) =>
+              page.data.some((note) => note.id === id),
+            )
+          ) {
+            return current
+          }
+
+          return {
+            ...current,
+            pages: current.pages.map((page, index) =>
+              index === pageIndex
+                ? { ...page, data: page.data.toSpliced(noteIndex, 0, note) }
+                : page,
+            ),
+          }
+        },
+      )
     },
   })
 
-  const [availableTags, setAvailableTags] = useState<string[]>([])
-  useEffect(() => {
-    fetchAllTags(user!.id)
-      .then((tags) => {
-        setAvailableTags(tags)
-      })
-      .catch((error) => console.error('Error fetching tags:', error))
-  }, [user])
-
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const activeTags = selectedTags.filter((tag) => availableTags.includes(tag))
-  const queryString = buildQueryString(filters, activeTags)
-
-  const handleFilterChange = (
-    filter: string,
-    fn: (query: NoteQuery) => void,
-  ) => {
-    setFilters((prev) => ({ ...prev, [filter]: fn }))
-  }
-
-  useEffect(() => {
-    const controller = new AbortController()
-    fetch(`${API_URL}/notes${queryString}`, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data: NoteDTO[]) => {
-        setNotes(data.map((note) => mapNoteFromDTO(note)))
-      })
-      .catch((error) => {
-        if (error.name === 'AbortError') {
-          console.log('Fetch aborted')
-        } else {
-          console.error('Error fetching notes:', error)
-        }
-      })
-
-    return () => {
-      controller.abort()
-    }
-  }, [queryString])
-
   const handleDelete = (id: string) => {
-    fetch(`${API_URL}/notes/${id}`, {
-      method: 'DELETE',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return fetch(`${API_URL}/notes${queryString}`)
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data: NoteDTO[]) => {
-        setNotes(data.map((note) => mapNoteFromDTO(note)))
-        return fetchAllTags(user!.id)
-      })
-      .then((tags) => {
-        setAvailableTags(tags)
-      })
-      .catch((error) => {
-        if (error.name === 'AbortError') {
-          console.log('Fetch aborted')
-        } else {
-          console.error('Error deleting note:', error)
-        }
-      })
+    deleteMutation.mutate(id)
   }
 
   return (
@@ -153,23 +181,12 @@ export default function NotesPage() {
       <div className="mx-auto flex max-w-160 flex-col gap-6 px-5 pt-12 pb-16">
         <h1 className="text-2xl font-semibold tracking-[-0.01em]">My Notes</h1>
         <NoteFilterForm
-          onFilterChange={handleFilterChange}
-          availableTags={availableTags}
-          selectedTags={selectedTags}
-          onTagsChange={setSelectedTags}
+          filters={filters}
+          onFilterChange={setFilters}
+          availableTags={availableTags ?? []}
           activeTags={activeTags}
         />
-        {notes.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-line-strong px-4 py-10 text-center text-muted">
-            No notes found
-          </p>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {notes.map((note) => (
-              <NoteCard key={note.id} note={note} onDelete={handleDelete} />
-            ))}
-          </div>
-        )}
+        <NoteList queryString={queryString} onDelete={handleDelete} />
       </div>
     </>
   )
