@@ -9,6 +9,7 @@ import ErrorPage from '../pages/ErrorPage.tsx'
 import Layout from '../pages/Layout.tsx'
 import AuthProvider from './AuthProvider.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient()
 
@@ -69,6 +70,7 @@ export default function App() {
       <AuthProvider>
         <RouterProvider router={router} />
       </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
     </QueryClientProvider>
   )
 }
