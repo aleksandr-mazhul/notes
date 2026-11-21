@@ -1,22 +1,54 @@
-import { useState } from 'react'
-import type { User } from '../types'
+import { skipToken, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, type ReactNode } from 'react'
 import { AuthContext } from '../hooks/useAuthContext.tsx'
 
-export default function AuthProvider({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('user')!) || null
-    } catch {
-      return null
+const currentUserQueryKey = ['auth', 'user'] as const
+
+function readStoredUser() {
+  try {
+    const storedUser: unknown = JSON.parse(
+      localStorage.getItem('user') ?? 'null',
+    )
+    if (
+      storedUser &&
+      typeof storedUser === 'object' &&
+      'id' in storedUser &&
+      typeof storedUser.id === 'string' &&
+      'email' in storedUser &&
+      typeof storedUser.email === 'string'
+    ) {
+      return { id: storedUser.id, email: storedUser.email }
     }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+export default function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient()
+  const { data: user = null } = useQuery({
+    queryKey: currentUserQueryKey,
+    queryFn: skipToken,
+    initialData: readStoredUser,
   })
-  const handleUserChange = (newUser: User | null) => {
-    setUser(newUser)
-    localStorage.setItem('user', JSON.stringify(newUser))
+
+  useEffect(() => {
+    try {
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user))
+      } else {
+        localStorage.removeItem('user')
+      }
+    } catch {
+      return
+    }
+  }, [user])
+
+  const handleUserChange = (newUser: typeof user) => {
+    const currentUser = newUser && { id: newUser.id, email: newUser.email }
+    queryClient.setQueryData(currentUserQueryKey, currentUser)
   }
 
   return (
